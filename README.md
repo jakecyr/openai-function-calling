@@ -65,4 +65,4 @@ export OPENAI_API_KEY=SOME_KEY_VALUE
 OPENAI_API_KEY=SOME_KEY_VALUE python examples/weather_functions.py
 ```
 
-See complete examples in the [./examples](./examples/) folder.
+See complete examples in the [./examples](https://github.com/jakecyr/openai-function-calling/tree/master/examples) folder.
