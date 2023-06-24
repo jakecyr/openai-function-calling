@@ -13,7 +13,6 @@ class FunctionDict(TypedDict):
     name: str
     description: str
     parameters: ParametersDict
-    required: NotRequired[list[str]]
 
 
 class Function:
@@ -35,15 +34,25 @@ class Function:
         for parameter in self.parameters or []:
             parameters_dict[parameter.name] = parameter.to_dict()
 
-        if self.required_parameters:
-            parameters_dict["required"]
-
-        return {
+        output_dict: FunctionDict = {
             "name": self.name,
             "description": self.description,
             "parameters": {
                 "type": "object",
                 "properties": parameters_dict,
-                "required": ["location"],
             },
         }
+
+        if self.required_parameters is None or len(self.required_parameters) == 0:
+            return output_dict
+
+        for parameter in self.required_parameters:
+            if parameter not in parameters_dict:
+                raise ValueError(
+                    "Cannot require a parameter that does not have a "
+                    f"definition: '{parameter}'"
+                )
+
+        output_dict["parameters"]["required"] = self.required_parameters
+
+        return output_dict

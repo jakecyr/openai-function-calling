@@ -10,11 +10,15 @@ class ParameterDict(TypedDict):
 
 class Parameter:
     def __init__(
-        self, name: str, type: str, description: str, enum: Optional[list[Any]] = None
+        self,
+        name: str,
+        type: str,
+        description: Optional[str] = None,
+        enum: Optional[list[Any]] = None,
     ) -> None:
         self.name: str = name
         self.type: str = type
-        self.description: str = description
+        self.description: str | None = description
         self.enum: list[Any] | None = enum
 
     def to_dict(self) -> ParameterDict:
