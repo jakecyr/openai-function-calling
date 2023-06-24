@@ -28,4 +28,4 @@ jobs:
       - name: Test Coverage
         run: |
           poetry run coverage run --source openai_function_calling -m pytest
-          poetry run coverage report --fail-under=90 --show-missing"
+          poetry run coverage report --fail-under=90 --show-missing
