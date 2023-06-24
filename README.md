@@ -50,3 +50,17 @@ response = openai.ChatCompletion.create(
     functions=[get_current_weather_function_dict],
 )
 ```
+
+## Examples
+
+To run the examples, set the environment variable `OPENAI_API_KEY` to your OpenAI API key. For example:
+
+```bash
+export OPENAI_API_KEY=SOME_KEY_VALUE
+
+# or when running an example
+
+OPENAI_API_KEY=SOME_KEY_VALUE python examples/weather_functions.py
+```
+
+See complete examples in the [./examples](./examples/) folder.

@@ -1,4 +1,5 @@
 import json
+from typing import Any, Callable
 import openai
 from openai_function_calling import Function, FunctionDict, Parameter
 
@@ -36,7 +37,7 @@ get_tomorrows_weather_function_dict: FunctionDict = (
     get_tomorrows_weather_function.to_dict()
 )
 
-response = openai.ChatCompletion.create(
+response: Any = openai.ChatCompletion.create(
     model="gpt-3.5-turbo-0613",
     messages=messages,
     functions=[get_current_weather_function_dict, get_tomorrows_weather_function_dict],
@@ -48,18 +49,18 @@ response_message = response["choices"][0]["message"]
 # Check if GPT wants to call a function.
 if response_message.get("function_call"):
     # Call the function.
-    available_functions = {
+    available_functions: dict[str, Callable] = {
         "get_current_weather": get_current_weather,
         "get_tomorrows_weather": get_tomorrows_weather,
     }
 
     function_name = response_message["function_call"]["name"]
     function_args = json.loads(response_message["function_call"]["arguments"])
-    function_to_call = available_functions[function_name]
+    function_to_call: Callable = available_functions[function_name]
 
-    function_response: str = function_to_call(
+    function_response: Any = function_to_call(
         location=function_args.get("location"),
         unit=function_args.get("unit"),
     )
 
-    print(f"Called {function_name} with response: {function_response}")
+    print(f"Called {function_name} with response: {function_response!s}")
