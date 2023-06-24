@@ -8,10 +8,10 @@ packages = [{include = "openai_function_calling"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-openai = "^0.27.8"
 typing-extensions = "^4.6.3"
 
 [tool.poetry.group.dev.dependencies]
+openai = "^0.27.8"
 black = "^23.3.0"
 pytest = "^7.4.0"
 ruff = "^0.0.275"

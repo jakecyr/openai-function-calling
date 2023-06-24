@@ -12,6 +12,8 @@ Install from PyPi with:
 pip install openai-function-calling
 ```
 
+**The openai-function-calling package does come with the openai package. It must be installed separately with `pip install openai`**
+
 ## Usage
 
 ```python
@@ -64,5 +66,7 @@ export OPENAI_API_KEY=SOME_KEY_VALUE
 
 OPENAI_API_KEY=SOME_KEY_VALUE python examples/weather_functions.py
 ```
+
+Make sure to also follow all instructions in the [Installation section](#installation).
 
 See complete examples in the [./examples](https://github.com/jakecyr/openai-function-calling/tree/master/examples) folder.
