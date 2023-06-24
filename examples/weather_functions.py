@@ -13,7 +13,10 @@ def get_tomorrows_weather(location: str, unit: str) -> str:
 
 
 messages: list[dict[str, str]] = [
-    {"role": "user", "content": "What will the weather be like in Boston, MA tomorrow?"}
+    {
+        "role": "user",
+        "content": "What will the weather be like in Boston, MA tomorrow in celsius?",
+    }
 ]
 
 location_parameter = Parameter(
