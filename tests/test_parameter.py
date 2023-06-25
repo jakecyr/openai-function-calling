@@ -78,3 +78,31 @@ def test_to_dict_returns_dict_with_expected_type() -> None:
     unit_parameter_dict: ParameterDict = unit_parameter.to_dict()
 
     assert unit_parameter_dict["type"] == parameter_type
+
+
+def test_init_with_type_array_and_no_array_item_type_raises_value_error() -> None:
+    with pytest.raises(ValueError):
+        Parameter(
+            name="unit",
+            type="array",
+        )
+
+
+def test_init_with_type_not_array_with_array_item_type_raises_value_error() -> None:
+    with pytest.raises(ValueError):
+        Parameter(name="unit", type="string", array_item_type="string")
+
+
+def test_to_dict_with_type_array_items_returns_expected_dict() -> None:
+    parameter = Parameter(name="unit", type="array", array_item_type="string")
+
+    parameter_dict: ParameterDict = parameter.to_dict()
+
+    assert (
+        "items" in parameter_dict
+    ), "Expected parameter dict to have 'items' property."
+    assert (
+        "type" in parameter_dict["items"]
+    ), "Expected parameter 'items' dict to have 'type' property."
+    assert isinstance(parameter_dict["items"]["type"], str)
+    assert parameter_dict["items"]["type"] == "string"
