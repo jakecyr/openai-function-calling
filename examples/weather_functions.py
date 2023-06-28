@@ -1,7 +1,16 @@
+"""Weather Example.
+
+Uses the function calling wrappers to decide between two functions
+and extract entities to pass into the chosen function as arguments.
+"""
+
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
+
 import openai
-from openai_function_calling import Function, FunctionDict, Parameter, JsonSchemaType
+
+from openai_function_calling import Function, FunctionDict, JsonSchemaType, Parameter
 
 
 # Define our functions.
@@ -20,7 +29,7 @@ location_parameter = Parameter(
     description="The city and state, e.g. San Francisco, CA",
 )
 unit_parameter = Parameter(
-    name="unit", type=JsonSchemaType.STRING, enum=["celsius", "fahrenheit"]
+    name="unit", type=JsonSchemaType.STRING, enum=["celsius", "fahrenheit"],
 )
 get_current_weather_function = Function(
     name="get_current_weather",
@@ -47,8 +56,8 @@ response: Any = openai.ChatCompletion.create(
     messages=[
         {
             "role": "user",
-            "content": "What will the weather be like in Boston, MA tomorrow in celsius?",
-        }
+            "content": "What will the weather be tomorrow in Boston MA in celsius?",
+        },
     ],
     functions=[get_current_weather_function_dict, get_tomorrows_weather_function_dict],
     function_call="auto",  # Auto is the default.

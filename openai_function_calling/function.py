@@ -1,7 +1,9 @@
 """Define the Function class and related objects."""
 
-from typing import Optional, TypedDict
+from typing import TypedDict
+
 from typing_extensions import NotRequired
+
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter, ParameterDict
 
@@ -23,15 +25,14 @@ class FunctionDict(TypedDict):
 
 
 class Function:
-    """A wrapper for an existing Python function that automatically converts
-    to JSON schema."""
+    """A Python function wrapper that converts to JSON schema."""
 
     def __init__(
         self,
         name: str,
         description: str,
-        parameters: Optional[list[Parameter]] = None,
-        required_parameters: Optional[list[str]] = None,
+        parameters: list[Parameter] | None = None,
+        required_parameters: list[str] | None = None,
     ) -> None:
         """Create a new function instance.
 
@@ -39,7 +40,7 @@ class Function:
             name: The name of the function.
             description: A description of the function's purpose.
             parameters: A list of parameters.
-            required_parameter: A list of parameter names that are required to run the\
+            required_parameters: A list of parameter names that are required to run the\
                 function.
         """
         self.name: str = name
@@ -54,13 +55,13 @@ class Function:
         if not self.required_parameters:
             return
 
-        parameter_names = set(p.name for p in self.parameters or [])
+        parameter_names = {p.name for p in self.parameters or []}
 
         for required_parameter in self.required_parameters:
             if required_parameter not in parameter_names:
                 raise ValueError(
                     f"Cannot require a parameter, '{required_parameter}', that is not "
-                    "defined."
+                    "defined.",
                 )
 
     def to_json_schema(self) -> FunctionDict:

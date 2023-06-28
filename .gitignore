@@ -6,3 +6,4 @@ __pycache__
 dist
 .coverage
 htmlcov
+.mypy_cache

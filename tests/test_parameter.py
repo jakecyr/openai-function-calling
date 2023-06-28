@@ -1,8 +1,9 @@
 """Test the Parameter class."""
 
+import pytest
+
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter, ParameterDict
-import pytest
 
 
 def test_to_json_schema_with_description_returns_dict_with_description() -> None:
@@ -84,7 +85,10 @@ def test_to_json_schema_returns_dict_with_expected_type() -> None:
 
 
 def test_init_with_type_array_and_no_array_item_type_raises_value_error() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="Expected 'array_item_type' value since type is set to 'array'*",
+    ):
         Parameter(
             name="unit",
             type=JsonSchemaType.ARRAY,
@@ -92,7 +96,10 @@ def test_init_with_type_array_and_no_array_item_type_raises_value_error() -> Non
 
 
 def test_init_with_type_not_array_with_array_item_type_raises_value_error() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="Unexpected 'array_item_type' value since type is not set to 'array'*",
+    ):
         Parameter(
             name="unit",
             type=JsonSchemaType.STRING,
@@ -102,7 +109,9 @@ def test_init_with_type_not_array_with_array_item_type_raises_value_error() -> N
 
 def test_to_json_schema_with_type_array_items_returns_expected_dict() -> None:
     parameter = Parameter(
-        name="unit", type=JsonSchemaType.ARRAY, array_item_type=JsonSchemaType.STRING
+        name="unit",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
     )
 
     parameter_dict: ParameterDict = parameter.to_json_schema()
