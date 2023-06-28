@@ -1,9 +1,10 @@
 """Test the Function class."""
 
 import pytest
+
+from openai_function_calling.function import Function, FunctionDict
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
-from openai_function_calling.function import Function, FunctionDict
 
 
 def test_function_to_json_schema_returns_expected_dict() -> None:
@@ -25,16 +26,20 @@ def test_function_to_json_schema_returns_expected_dict() -> None:
         },
     }
     location_parameter = Parameter(
-        "location", JsonSchemaType.STRING, "The city and state, e.g. San Francisco, CA"
+        name="location",
+        type=JsonSchemaType.STRING,
+        description="The city and state, e.g. San Francisco, CA",
     )
     unit_parameter = Parameter(
-        "unit", JsonSchemaType.STRING, "", enum=["celsius", "fahrenheit"]
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
     )
 
     get_current_weather_function = Function(
-        "get_current_weather",
-        "Get the current weather",
-        [location_parameter, unit_parameter],
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[location_parameter, unit_parameter],
     )
 
     get_current_weather_function_dict: FunctionDict = (
@@ -48,10 +53,15 @@ def test_to_json_schema_with_required_parameters_adds_to_json_schema() -> None:
     required_parameters: list[str] = ["location"]
 
     location_parameter = Parameter(
-        "location", JsonSchemaType.STRING, "The city and state, e.g. San Francisco, CA"
+        "location",
+        JsonSchemaType.STRING,
+        "The city and state, e.g. San Francisco, CA",
     )
     unit_parameter = Parameter(
-        "unit", JsonSchemaType.STRING, "", enum=["celsius", "fahrenheit"]
+        "unit",
+        JsonSchemaType.STRING,
+        "",
+        enum=["celsius", "fahrenheit"],
     )
     get_current_weather_function = Function(
         "get_current_weather",
@@ -73,10 +83,19 @@ def test_init_with_required_parameter_not_defined_raises_value_error() -> None:
     required_parameters: list[str] = ["location"]
 
     unit_parameter = Parameter(
-        "unit", JsonSchemaType.STRING, "", enum=["celsius", "fahrenheit"]
+        "unit",
+        JsonSchemaType.STRING,
+        "",
+        enum=["celsius", "fahrenheit"],
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=(
+            f"Cannot require a parameter, '{required_parameters[0]}', "
+            "that is not defined."
+        ),
+    ):
         Function(
             "get_current_weather",
             "Get the current weather",
@@ -85,11 +104,16 @@ def test_init_with_required_parameter_not_defined_raises_value_error() -> None:
         )
 
 
-def test_to_json_schema_with_required_parameter_not_defined_raises_value_error() -> None:
+def test_to_json_schema_with_required_parameter_not_defined_raises_value_error() -> (
+    None
+):
     required_parameters: list[str] = ["location"]
 
     unit_parameter = Parameter(
-        "unit", JsonSchemaType.STRING, "", enum=["celsius", "fahrenheit"]
+        "unit",
+        JsonSchemaType.STRING,
+        "",
+        enum=["celsius", "fahrenheit"],
     )
     get_current_weather_function = Function(
         "get_current_weather",
@@ -99,7 +123,13 @@ def test_to_json_schema_with_required_parameter_not_defined_raises_value_error()
 
     get_current_weather_function.required_parameters = required_parameters
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=(
+            f"Cannot require a parameter, '{required_parameters[0]}', "
+            "that is not defined."
+        ),
+    ):
         get_current_weather_function.to_json_schema()
 
 

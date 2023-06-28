@@ -1,0 +1,22 @@
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "B", "Q", "I", "N", "D", "UP", "ANN", "S", "BLE", "FBT", "COM", "C4", "FA", "ICN", "G004", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "TD", "ERA", "PL", "PLE", "PLR", "PLW", "RUF"]
+fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
+ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913"]
+exclude = [
+  ".bzr",
+  ".direnv",
+  ".eggs",
+  ".git",
+  ".git-rewrite",
+  ".hg",
+  ".mypy_cache",
+  ".ruff_cache",
+  "build",
+  "dist",
+  "venv",
+  ".venv",
+]
+[per-file-ignores]
+"tests/*" = ["D103", "S101"]
+"examples/*" = ["D103", "T201"]

@@ -1,6 +1,7 @@
 """Define the Parameter class and related objects."""
 
-from typing import TypedDict, Optional, Any
+from typing import Any, TypedDict
+
 from typing_extensions import NotRequired
 
 from openai_function_calling.json_schema_type import JsonSchemaType
@@ -28,10 +29,10 @@ class Parameter:
         self,
         name: str,
         type: JsonSchemaType | str,
-        description: Optional[str] = None,
+        description: str | None = None,
         *,
-        enum: Optional[list[Any]] = None,
-        array_item_type: Optional[str] = None,
+        enum: list[Any] | None = None,
+        array_item_type: str | None = None,
     ) -> None:
         """Create a new parameter instance.
 
@@ -49,7 +50,6 @@ class Parameter:
             ValueError: If the 'array_item_type' argument is set, but the 'type' is not\
                 'array'.
         """
-
         self.name: str = name
         self.type: str = type
         self.description: str | None = description
@@ -67,12 +67,12 @@ class Parameter:
         """
         if self.type == JsonSchemaType.ARRAY and self.array_item_type is None:
             raise ValueError(
-                "Expected 'array_item_type' value since type is set to 'array'."
+                "Expected 'array_item_type' value since type is set to 'array'.",
             )
 
         if self.type != JsonSchemaType.ARRAY and self.array_item_type is not None:
             raise ValueError(
-                "Unexpected 'array_item_type' value since type is not set to 'array'."
+                "Unexpected 'array_item_type' value since type is not set to 'array'.",
             )
 
     def to_json_schema(self) -> ParameterDict:

@@ -1,4 +1,4 @@
-"""OpenAI Function Calling Package"""
+"""OpenAI Function Calling Package."""
 
 from openai_function_calling.function import Function, FunctionDict, ParametersDict
 from openai_function_calling.json_schema_type import JsonSchemaType
