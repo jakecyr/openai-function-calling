@@ -1,4 +1,4 @@
-# OpenAI Function Calling
+# OpenAI Function Calling - JSON Schema Wrappers
 
 ![GitHub Actions Build Status](https://github.com/jakecyr/openai-function-calling/actions/workflows/test-application.yml/badge.svg)
 
