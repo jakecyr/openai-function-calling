@@ -17,7 +17,7 @@ pip install openai-function-calling
 ## Usage
 
 ```python
-from openai_function_calling import Function, FunctionDict, Parameter
+from openai_function_calling import Function, FunctionDict, Parameter, JsonSchemaType
 
 def get_current_weather(location: str, unit: str) -> str:
   # Do some stuff here...
@@ -25,12 +25,12 @@ def get_current_weather(location: str, unit: str) -> str:
 # Define the function parameters.
 location_parameter = Parameter(
     name="location",
-    type="string",
+    type=JsonSchemaType.STRING,
     description="The city and state, e.g. San Francisco, CA"
 )
 unit_parameter = Parameter(
     name="unit",
-    type="string",
+    type=JsonSchemaType.STRING,
     description="The temperature unit to use.",
     enum=["celsius", "fahrenheit"]
 )
@@ -43,7 +43,7 @@ get_current_weather_function = Function(
 )
 
 # Convert to a JSON schema dict to send to OpenAI.
-get_current_weather_function_dict = get_current_weather_function.to_dict()
+get_current_weather_function_dict = get_current_weather_function.to_json_schema()
 
 # Get the function to call from ChatGPT.
 response = openai.ChatCompletion.create(

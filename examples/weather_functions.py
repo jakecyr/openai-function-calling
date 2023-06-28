@@ -1,48 +1,55 @@
 import json
 from typing import Any, Callable
 import openai
-from openai_function_calling import Function, FunctionDict, Parameter
+from openai_function_calling import Function, FunctionDict, Parameter, JsonSchemaType
 
 
+# Define our functions.
 def get_current_weather(location: str, unit: str) -> str:
-    return f"Called get_current_weather with location {location} and unit {unit}."
+    return f"It is currently sunny in {location} and 75 degrees {unit}."
 
 
 def get_tomorrows_weather(location: str, unit: str) -> str:
-    return f"Called get_tomorrows_weather with location {location} and unit {unit}."
+    return f"It will be rainy tomorrow in {location} and around 65 degrees {unit}."
 
 
-messages: list[dict[str, str]] = [
-    {
-        "role": "user",
-        "content": "What will the weather be like in Boston, MA tomorrow in celsius?",
-    }
-]
-
+# Convert our functions to JSON schema.
 location_parameter = Parameter(
-    "location", "string", "The city and state, e.g. San Francisco, CA"
+    name="location",
+    type=JsonSchemaType.STRING,
+    description="The city and state, e.g. San Francisco, CA",
 )
-unit_parameter = Parameter("unit", "string", "", enum=["celsius", "fahrenheit"])
+unit_parameter = Parameter(
+    name="unit", type=JsonSchemaType.STRING, enum=["celsius", "fahrenheit"]
+)
 get_current_weather_function = Function(
-    "get_current_weather",
-    "Get the current weather",
-    [location_parameter, unit_parameter],
+    name="get_current_weather",
+    description="Get the current weather",
+    parameters=[location_parameter, unit_parameter],
 )
 get_tomorrows_weather_function = Function(
-    "get_tomorrows_weather",
-    "Get the tomorrow's weather",
-    [location_parameter, unit_parameter],
+    name="get_tomorrows_weather",
+    description="Get the tomorrow's weather",
+    parameters=[location_parameter, unit_parameter],
 )
 
-
-get_current_weather_function_dict: FunctionDict = get_current_weather_function.to_dict()
+get_current_weather_function_dict: FunctionDict = (
+    get_current_weather_function.to_json_schema()
+)
 get_tomorrows_weather_function_dict: FunctionDict = (
-    get_tomorrows_weather_function.to_dict()
+    get_tomorrows_weather_function.to_json_schema()
 )
 
+
+# Send the query and our function context to OpenAI.
 response: Any = openai.ChatCompletion.create(
     model="gpt-3.5-turbo-0613",
-    messages=messages,
+    messages=[
+        {
+            "role": "user",
+            "content": "What will the weather be like in Boston, MA tomorrow in celsius?",
+        }
+    ],
     functions=[get_current_weather_function_dict, get_tomorrows_weather_function_dict],
     function_call="auto",  # Auto is the default.
 )
@@ -60,10 +67,8 @@ if response_message.get("function_call"):
     function_name = response_message["function_call"]["name"]
     function_args = json.loads(response_message["function_call"]["arguments"])
     function_to_call: Callable = available_functions[function_name]
+    function_response: Any = function_to_call(**function_args)
 
-    function_response: Any = function_to_call(
-        location=function_args.get("location"),
-        unit=function_args.get("unit"),
-    )
-
-    print(f"Called {function_name} with response: {function_response!s}")
+    print(f"Called {function_name} with response: '{function_response!s}'.")
+else:
+    print("GPT does not want to called a function for the given query.")

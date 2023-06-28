@@ -1,12 +1,20 @@
+"""Define the Parameter class and related objects."""
+
 from typing import TypedDict, Optional, Any
 from typing_extensions import NotRequired
 
+from openai_function_calling.json_schema_type import JsonSchemaType
+
 
 class ItemsDict(TypedDict):
+    """JSON Schema representation of array items."""
+
     type: str
 
 
 class ParameterDict(TypedDict):
+    """JSON Schema representation of a parameter."""
+
     type: str
     description: NotRequired[str]
     enum: NotRequired[list[Any]]
@@ -14,10 +22,12 @@ class ParameterDict(TypedDict):
 
 
 class Parameter:
+    """A wrapper for function parameters to convert them to JSON schema."""
+
     def __init__(
         self,
         name: str,
-        type: str,
+        type: JsonSchemaType | str,
         description: Optional[str] = None,
         *,
         enum: Optional[list[Any]] = None,
@@ -32,16 +42,13 @@ class Parameter:
             enum: A list of allowed values for the parameter.
             array_item_type: If the type is set to 'array', the JSON\
                 schema type of the items it contains.
-        """
-        if type == "array" and array_item_type is None:
-            raise ValueError(
-                "Expected 'array_item_type' value since type is set to 'array'."
-            )
 
-        if type != "array" and array_item_type is not None:
-            raise ValueError(
-                "Unexpected 'array_item_type' value since type is not set to 'array'."
-            )
+        Raises:
+            ValueError: If the 'type' is set to 'array', but 'array_item_type' argument\
+                is not set.
+            ValueError: If the 'array_item_type' argument is set, but the 'type' is not\
+                'array'.
+        """
 
         self.name: str = name
         self.type: str = type
@@ -49,12 +56,36 @@ class Parameter:
         self.enum: list[Any] | None = enum
         self.array_item_type: str | None = array_item_type
 
-    def to_dict(self) -> ParameterDict:
+        self.validate()
+
+    def validate(self) -> None:
+        """Validate the parameter has valid properties.
+
+        Raises:
+            ValueError: If 'array_item_type' is not set, but 'type' is array.
+            ValueError: If 'array_item_type' is set, but 'type' is not array.
+        """
+        if self.type == JsonSchemaType.ARRAY and self.array_item_type is None:
+            raise ValueError(
+                "Expected 'array_item_type' value since type is set to 'array'."
+            )
+
+        if self.type != JsonSchemaType.ARRAY and self.array_item_type is not None:
+            raise ValueError(
+                "Unexpected 'array_item_type' value since type is not set to 'array'."
+            )
+
+    def to_json_schema(self) -> ParameterDict:
         """Convert to a JSON schema dict object.
 
         Returns:
             A dict representation of the parameter in a JSON schema format.
+
+        Raises:
+            ValueError: If there are validation errors. See the validate method.
         """
+        self.validate()
+
         output_dict: ParameterDict = {
             "type": self.type,
         }

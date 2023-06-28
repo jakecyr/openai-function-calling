@@ -7,8 +7,8 @@ readme = "README.md"
 packages = [{include = "openai_function_calling"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-typing-extensions = "^4.6.3"
+python = ">=3.10, <=3.12"
+typing-extensions = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
 openai = "^0.27.8"
