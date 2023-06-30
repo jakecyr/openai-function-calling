@@ -144,3 +144,44 @@ def test_function_to_json_schema_without_parameters_returns_empty_dict() -> None
     )
 
     assert get_current_weather_function_dict["parameters"]["properties"] == {}
+
+
+def test_to_dict_returns_same_value_as_to_json_schema() -> None:
+    expected_dict: FunctionDict = {
+        "name": "get_current_weather",
+        "description": "Get the current weather",
+        "parameters": {
+            "type": JsonSchemaType.OBJECT,
+            "properties": {
+                "location": {
+                    "type": JsonSchemaType.STRING,
+                    "description": "The city and state, e.g. San Francisco, CA",
+                },
+                "unit": {
+                    "type": JsonSchemaType.STRING,
+                    "enum": ["celsius", "fahrenheit"],
+                },
+            },
+        },
+    }
+    location_parameter = Parameter(
+        name="location",
+        type=JsonSchemaType.STRING,
+        description="The city and state, e.g. San Francisco, CA",
+    )
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[location_parameter, unit_parameter],
+    )
+
+    assert (
+        get_current_weather_function.to_json_schema()
+        == get_current_weather_function.to_dict()
+    )

@@ -2,7 +2,7 @@
 
 from typing import TypedDict
 
-from typing_extensions import NotRequired
+from typing_extensions import NotRequired, deprecated
 
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter, ParameterDict
@@ -63,6 +63,21 @@ class Function:
                     f"Cannot require a parameter, '{required_parameter}', that is not "
                     "defined.",
                 )
+
+    @deprecated(
+        "The to_dict method has been deprecated in favor of the "
+        "to_json_schema method. Please use the to_json_schema method instead.",
+    )
+    def to_dict(self) -> FunctionDict:
+        """Convert the function instance to a JSON schema dict.
+
+        Raises:
+            ValueError: If a parameter is marked as required, but it not defined.
+
+        Returns:
+            A JSON schema representation of the function.
+        """
+        return self.to_json_schema()
 
     def to_json_schema(self) -> FunctionDict:
         """Convert the function instance to a JSON schema dict.

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "openai-function-calling"
-version = "1.0.0"
+version = "1.0.1"
 description = "Helper functions to generate OpenAI GPT function calling requests."
 authors = ["Jake Cyr <cyrjake@gmail.com>"]
 readme = "README.md"
