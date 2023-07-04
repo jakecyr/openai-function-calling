@@ -108,7 +108,7 @@ class Function:
             "name": self.name,
             "description": self.description,
             "parameters": {
-                "type": JsonSchemaType.OBJECT,
+                "type": JsonSchemaType.OBJECT.value,
                 "properties": parameters_dict,
             },
         }

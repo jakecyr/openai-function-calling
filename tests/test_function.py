@@ -175,8 +175,8 @@ def test_from_reference_returns_a_new_function() -> None:
         """Calculate the sum of integers and return the result.
 
         Args:
-            a (int): _description_
-            b (int): _description_
+            a (int): The first integer to sum.
+            b (int): The second integer to sum.
 
         Returns:
             int: _description_
@@ -197,6 +197,8 @@ def test_from_reference_returns_a_new_function() -> None:
     assert function_definition.parameters[1].name == "b"
     assert function_definition.parameters[0].type == "integer"
     assert function_definition.parameters[1].type == "integer"
+    assert function_definition.parameters[0].description == "The first integer to sum."
+    assert function_definition.parameters[1].description == "The second integer to sum."
 
 
 def test_from_reference_without_docstring_with_type_hints_return_expected_values() -> (
