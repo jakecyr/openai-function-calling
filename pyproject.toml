@@ -6,10 +6,14 @@ authors = ["Jake Cyr <cyrjake@gmail.com>"]
 readme = "README.md"
 packages = [{include = "openai_function_calling"}]
 include = ["openai_function_calling/py.typed"]
+repository = "https://github.com/jakecyr/openai-function-calling"
 
 [tool.poetry.dependencies]
 python = ">=3.10, <=3.12"
 typing-extensions = "^4.0"
+
+[tool.poetry.group.dev]
+optional = true
 
 [tool.poetry.group.dev.dependencies]
 openai = "^0.27.8"
