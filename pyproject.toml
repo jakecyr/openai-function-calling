@@ -8,7 +8,7 @@ packages = [{include = "openai_function_calling"}]
 include = ["openai_function_calling/py.typed"]
 
 [tool.poetry.dependencies]
-python = ">=3.10, <3.12"
+python = ">=3.10, <=3.12"
 typing-extensions = "^4.0"
 
 [tool.poetry.group.dev]
