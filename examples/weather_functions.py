@@ -29,7 +29,9 @@ location_parameter = Parameter(
     description="The city and state, e.g. San Francisco, CA",
 )
 unit_parameter = Parameter(
-    name="unit", type=JsonSchemaType.STRING, enum=["celsius", "fahrenheit"],
+    name="unit",
+    type=JsonSchemaType.STRING,
+    enum=["celsius", "fahrenheit"],
 )
 get_current_weather_function = Function(
     name="get_current_weather",

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -24,10 +24,13 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install poetry
-          poetry install
+          poetry install --with dev
       - name: Check formatting with ruff
         run: |
           poetry run ruff check .
+      - name: Check formatting with black
+        run: |
+          poetry run black --check .
       - name: Test Coverage
         run: |
           poetry run coverage run --source openai_function_calling -m pytest
