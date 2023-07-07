@@ -16,7 +16,7 @@ pip install openai-function-calling
 
 ## Usage
 
-### Automatically Infer the Function Definition (Beta)
+### Auto-Infer the Function Definition (Beta)
 
 Automatically infer your function name, description, and parameters given a reference to the function. A `Function` instance is returned which can be converted to JSON schema with `.to_json_schema()` and then passed to the OpenAI chat completion API:
 

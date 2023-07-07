@@ -1,8 +1,8 @@
 line-length = 88
 target-version = "py310"
-select = ["E", "F", "B", "Q", "I", "N", "D", "UP", "ANN", "S", "BLE", "FBT", "COM", "C4", "FA", "ICN", "G004", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "TD", "ERA", "PL", "PLE", "PLR", "PLW", "RUF"]
+select = ["E", "F", "B", "Q", "I", "N", "D", "UP", "ANN", "S", "BLE", "FBT", "C4", "FA", "ICN", "G004", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SIM", "TID", "TCH", "ARG", "PTH", "TD", "ERA", "PL", "PLE", "PLR", "PLW", "RUF"]
 fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
-ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913"]
+ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913", "ANN401"]
 exclude = [
   ".bzr",
   ".direnv",
@@ -18,5 +18,5 @@ exclude = [
   ".venv",
 ]
 [per-file-ignores]
-"tests/*" = ["D103", "S101", "PLR2004", "ANN001", "D205", "E501"]
+"tests/*" = ["D103", "S101", "PLR2004", "ANN001", "D205", "E501", "D401"]
 "examples/*" = ["D103", "T201"]

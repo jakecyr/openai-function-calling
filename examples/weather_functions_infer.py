@@ -9,7 +9,8 @@ from collections.abc import Callable
 from typing import Any
 
 import openai
-from openai_function_calling import Function
+
+from openai_function_calling import FunctionInferer
 
 
 # Define our functions.
@@ -23,12 +24,12 @@ def get_tomorrows_weather(location: str, unit: str) -> str:
     return f"It will be rainy tomorrow in {location} and around 65 degrees {unit}."
 
 
-get_current_weather_schema = Function.from_function(
-    get_current_weather
+get_current_weather_schema = FunctionInferer.infer_from_function_reference(
+    get_current_weather,
 ).to_json_schema()
 
-get_tomorrows_weather_schema = Function.from_function(
-    get_tomorrows_weather
+get_tomorrows_weather_schema = FunctionInferer.infer_from_function_reference(
+    get_tomorrows_weather,
 ).to_json_schema()
 
 

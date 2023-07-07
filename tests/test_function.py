@@ -170,178 +170,176 @@ def test_to_dict_returns_same_value_as_to_json_schema() -> None:
     )
 
 
-def test_from_reference_returns_a_new_function() -> None:
-    def sum(a: int, b: int) -> int:
-        """Calculate the sum of integers and return the result.
-
-        Args:
-            a (int): The first integer to sum.
-            b (int): The second integer to sum.
-
-        Returns:
-            int: _description_
-        """
-        return a + b
-
-    function_definition: Function = Function.from_function(sum)
-
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert (
-        function_definition.description
-        == "Calculate the sum of integers and return the result."
+def test_merge_adds_new_values() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[],
+        required_parameters=[],
     )
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[0].type == "integer"
-    assert function_definition.parameters[1].type == "integer"
-    assert function_definition.parameters[0].description == "The first integer to sum."
-    assert function_definition.parameters[1].description == "The second integer to sum."
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert len(get_current_weather_function.parameters) == 1
+    assert len(get_current_weather_function.required_parameters) == 1
 
 
-def test_from_reference_without_docstring_with_type_hints_return_expected_values() -> (
-    None
-):
-    def sum(a: int, b: int) -> int:
-        return a + b
+def test_merge_does_not_replace_existing_values() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[],
+        required_parameters=[],
+    )
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
 
-    function_definition: Function = Function.from_function(sum)
+    get_current_weather_function.merge(get_tomorrows_weather_function)
 
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert function_definition.description == ""
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[0].type == "integer"
-    assert function_definition.parameters[1].type == "integer"
-
-
-def test_from_reference_with_no_type_hints_or_docstrings_still_returns_parameters() -> (
-    None
-):
-    def sum(a, b) -> int:
-        return a + b
-
-    function_definition: Function = Function.from_function(sum)
-
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert function_definition.description == ""
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[1].name == "b"
+    assert get_current_weather_function.name == "get_current_weather"
+    assert get_current_weather_function.description == "Get the current weather"
 
 
-def test_from_reference_with_only_type_hints_returns_expected_parameters() -> None:
-    def sum(a: int, b: int) -> int:
-        return a + b
+def test_merge_adds_new_values_to_parameters() -> None:
+    unit_parameter_old = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter_old],
+        required_parameters=[],
+    )
+    unit_parameter_new = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
 
-    function_definition: Function = Function.from_function(sum)
+    get_current_weather_function.merge(get_tomorrows_weather_function)
 
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert function_definition.description == ""
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[0].type == "integer"
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[1].type == "integer"
-
-
-def test_from_reference_with_only_docstring_no_types_returns_parameters_with_null_types() -> (
-    None
-):
-    def sum(a, b) -> int:
-        """
-        Args:
-            a: The first integer value.
-            b: The second integer value.
-        """
-        return a + b
-
-    function_definition: Function = Function.from_function(sum)
-
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[0].type == "null"
-    assert function_definition.parameters[0].description == "The first integer value."
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[1].type == "null"
-    assert function_definition.parameters[1].description == "The second integer value."
+    assert get_current_weather_function.parameters[0].enum == ["celsius", "fahrenheit"]
+    assert get_current_weather_function.parameters[0].type == JsonSchemaType.STRING
+    assert get_current_weather_function.required_parameters == ["unit"]
 
 
-def test_from_reference_with_only_docstring_with_types_returns_parameters_with_defined_types() -> (
-    None
-):
-    def sum(a, b) -> int:
-        """Sums two values.
+def test_merge_with_different_parameter_count_adds_parameter() -> None:
+    unit_parameter_old = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter_old],
+        required_parameters=[],
+    )
+    unit_parameter_new = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
 
-        Args:
-            a (integer): The first integer value.
-            b (integer): The second integer value.
-        """
-        return a + b
+    get_current_weather_function.merge(get_tomorrows_weather_function)
 
-    function_definition: Function = Function.from_function(sum)
-
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert function_definition.description == "Sums two values."
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[0].type == "integer"
-    assert function_definition.parameters[0].description == "The first integer value."
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[1].type == "integer"
-    assert function_definition.parameters[1].description == "The second integer value."
-
-
-def test_from_reference_with_type_hints_and_docstring_without_types_returns_parameter_with_types_and_descriptions() -> (
-    None
-):
-    def sum(a: float, b: float) -> float:
-        """
-        Args:
-            a: The first float value.
-            b: The second float value.
-        """
-        return a + b
-
-    function_definition: Function = Function.from_function(sum)
-
-    assert isinstance(function_definition, Function)
-
-    assert function_definition.name == "sum"
-    assert function_definition.description == ""
-    assert len(function_definition.parameters) == 2
-    assert function_definition.parameters[0].name == "a"
-    assert function_definition.parameters[0].type == JsonSchemaType.NUMBER
-    assert function_definition.parameters[0].description == "The first float value."
-    assert function_definition.parameters[1].name == "b"
-    assert function_definition.parameters[1].type == JsonSchemaType.NUMBER
-    assert function_definition.parameters[1].description == "The second float value."
+    assert get_current_weather_function.parameters[0].enum == ["celsius", "fahrenheit"]
+    assert get_current_weather_function.parameters[0].type == JsonSchemaType.STRING
+    assert get_current_weather_function.required_parameters == ["unit"]
 
 
-def test_from_reference_with_no_parameters_throws_returns_empty_parameters_list() -> (
-    None
-):
-    def do_something() -> None:
-        pass
+def test_merge_with_same_parameters_does_not_change() -> None:
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
+    unit_parameter_new = Parameter(
+        name=unit_parameter.name,
+        type=JsonSchemaType.NULL,
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
 
-    function_definition: Function = Function.from_function(do_something)
+    get_current_weather_function.merge(get_tomorrows_weather_function)
 
-    assert isinstance(function_definition, Function)
+    assert get_current_weather_function.parameters[0] == Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    assert (
+        get_current_weather_function.required_parameters
+        == get_tomorrows_weather_function.required_parameters
+    )
 
-    assert function_definition.name == "do_something"
-    assert function_definition.description == ""
-    assert len(function_definition.parameters) == 0
+
+def test_merge_with_no_name_sets_name() -> None:
+    get_current_weather_function = Function(None, None)  # type: ignore
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.name == get_tomorrows_weather_function.name
+    assert (
+        get_current_weather_function.description
+        == get_tomorrows_weather_function.description
+    )
+
+
+def test_merge_with_no_parameters_does_not_add_any() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert len(get_current_weather_function.parameters) == 0

@@ -1,10 +1,13 @@
 """Define the Parameter class and related objects."""
 
-from typing import Any, TypedDict
+from __future__ import annotations
 
-from typing_extensions import NotRequired
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from openai_function_calling.json_schema_type import JsonSchemaType
+
+if TYPE_CHECKING:
+    from typing_extensions import NotRequired
 
 
 class ItemsDict(TypedDict):
@@ -100,3 +103,49 @@ class Parameter:
             output_dict["items"] = {"type": self.array_item_type}
 
         return output_dict
+
+    def merge(self, other_parameter: Parameter) -> None:
+        """Merge another parameter into the current instance.
+
+        Will not replace values that already exist.
+
+        Args:
+            other_parameter: The other parameter instance to merge into the current.
+        """
+        if not isinstance(other_parameter, Parameter):
+            raise TypeError("Cannot merge non-parameter type into parameter.")
+
+        if self.name is None:
+            self.name = other_parameter.name
+
+        if self.type is None or self.type == JsonSchemaType.NULL:
+            self.type = other_parameter.type
+
+        if self.description is None:
+            self.description = other_parameter.description
+
+        if self.enum is None:
+            self.enum = other_parameter.enum
+
+        if self.array_item_type is None or self.array_item_type == JsonSchemaType.NULL:
+            self.array_item_type = other_parameter.array_item_type
+
+    def __eq__(self, other: Any) -> bool:
+        """Test if an object is equivalent to the parameter.
+
+        Args:
+            other: The other value to compare against.
+
+        Returns:
+            If the other object is equal to the current instance.
+        """
+        if not isinstance(other, Parameter):
+            return False
+
+        return (
+            self.name == other.name
+            and self.type == other.type
+            and self.description == other.description
+            and self.enum == other.enum
+            and self.array_item_type == other.array_item_type
+        )

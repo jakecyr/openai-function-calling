@@ -7,7 +7,7 @@ from openai_function_calling.helper_functions import python_type_to_json_schema_
 from openai_function_calling.json_schema_type import JsonSchemaType
 
 
-def test_null():
+def test_null() -> None:
     assert python_type_to_json_schema_type(None) == JsonSchemaType.NULL.value
 
 
