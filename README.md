@@ -1,6 +1,7 @@
 # OpenAI Function Calling
 
 ![GitHub Actions Build Status](https://github.com/jakecyr/openai-function-calling/actions/workflows/test-application.yml/badge.svg)
+![PyPi Pacakge Version](https://badge.fury.io/py/openai-function-calling.svg)
 
 Helper functions to generate JSON schema dicts for OpenAI ChatGPT function calling requests. See the [official Function Calling reference](https://platform.openai.com/docs/guides/gpt/function-calling) for more information.
 
