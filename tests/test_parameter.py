@@ -124,3 +124,81 @@ def test_to_json_schema_with_type_array_items_returns_expected_dict() -> None:
     ), "Expected parameter 'items' dict to have 'type' property."
     assert isinstance(parameter_dict["items"]["type"], str)
     assert parameter_dict["items"]["type"] == JsonSchemaType.STRING
+
+
+def test_eq_returns_true_if_parameters_are_equal() -> None:
+    parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+    )
+    other_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+    )
+
+    assert parameter == other_parameter
+
+
+def test_eq_returns_false_if_parameters_are_not_equal() -> None:
+    parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+    )
+    other_parameter = Parameter(
+        name="other",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+    )
+
+    assert parameter != other_parameter
+
+
+def test_merge_replaces_values_if_they_are_not_defined() -> None:
+    parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    other_parameter = Parameter(
+        name="other",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+        description="Some description",
+    )
+
+    parameter.merge(other_parameter)
+
+    assert parameter.type == JsonSchemaType.ARRAY
+    assert parameter.array_item_type == JsonSchemaType.STRING
+    assert parameter.description == "Some description"
+
+
+def test_merge_does_not_remove_values() -> None:
+    parameter = Parameter(
+        name="other",
+        type=JsonSchemaType.ARRAY,
+        array_item_type=JsonSchemaType.STRING,
+        description="Some description",
+    )
+    other_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+
+    parameter.merge(other_parameter)
+
+    assert parameter.type == JsonSchemaType.ARRAY
+    assert parameter.array_item_type == JsonSchemaType.STRING
+    assert parameter.description == "Some description"
+
+
+def test_merge_with_invalid_type_raises_type_error() -> None:
+    parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+
+    with pytest.raises(TypeError):
+        parameter.merge(1)  # type: ignore

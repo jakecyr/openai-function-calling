@@ -11,6 +11,7 @@ repository = "https://github.com/jakecyr/openai-function-calling"
 [tool.poetry.dependencies]
 python = ">=3.10, <=3.12"
 typing-extensions = "^4.0"
+docstring-parser = "^0.15"
 
 [tool.poetry.group.dev]
 optional = true

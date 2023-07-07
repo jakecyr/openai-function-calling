@@ -168,3 +168,178 @@ def test_to_dict_returns_same_value_as_to_json_schema() -> None:
         get_current_weather_function.to_json_schema()
         == get_current_weather_function.to_dict()
     )
+
+
+def test_merge_adds_new_values() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[],
+        required_parameters=[],
+    )
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert len(get_current_weather_function.parameters) == 1
+    assert len(get_current_weather_function.required_parameters) == 1
+
+
+def test_merge_does_not_replace_existing_values() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[],
+        required_parameters=[],
+    )
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.name == "get_current_weather"
+    assert get_current_weather_function.description == "Get the current weather"
+
+
+def test_merge_adds_new_values_to_parameters() -> None:
+    unit_parameter_old = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter_old],
+        required_parameters=[],
+    )
+    unit_parameter_new = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.parameters[0].enum == ["celsius", "fahrenheit"]
+    assert get_current_weather_function.parameters[0].type == JsonSchemaType.STRING
+    assert get_current_weather_function.required_parameters == ["unit"]
+
+
+def test_merge_with_different_parameter_count_adds_parameter() -> None:
+    unit_parameter_old = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter_old],
+        required_parameters=[],
+    )
+    unit_parameter_new = Parameter(
+        name="unit",
+        type=JsonSchemaType.STRING,
+        enum=["celsius", "fahrenheit"],
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.parameters[0].enum == ["celsius", "fahrenheit"]
+    assert get_current_weather_function.parameters[0].type == JsonSchemaType.STRING
+    assert get_current_weather_function.required_parameters == ["unit"]
+
+
+def test_merge_with_same_parameters_does_not_change() -> None:
+    unit_parameter = Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+        parameters=[unit_parameter],
+        required_parameters=["unit"],
+    )
+    unit_parameter_new = Parameter(
+        name=unit_parameter.name,
+        type=JsonSchemaType.NULL,
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+        parameters=[unit_parameter_new],
+        required_parameters=["unit"],
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.parameters[0] == Parameter(
+        name="unit",
+        type=JsonSchemaType.NULL,
+    )
+    assert (
+        get_current_weather_function.required_parameters
+        == get_tomorrows_weather_function.required_parameters
+    )
+
+
+def test_merge_with_no_name_sets_name() -> None:
+    get_current_weather_function = Function(None, None)  # type: ignore
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert get_current_weather_function.name == get_tomorrows_weather_function.name
+    assert (
+        get_current_weather_function.description
+        == get_tomorrows_weather_function.description
+    )
+
+
+def test_merge_with_no_parameters_does_not_add_any() -> None:
+    get_current_weather_function = Function(
+        name="get_current_weather",
+        description="Get the current weather",
+    )
+    get_tomorrows_weather_function = Function(
+        name="get_tomorrows_weather",
+        description="Get the weather for tomorrow",
+    )
+
+    get_current_weather_function.merge(get_tomorrows_weather_function)
+
+    assert len(get_current_weather_function.parameters) == 0
