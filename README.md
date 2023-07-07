@@ -22,11 +22,30 @@ pip install openai-function-calling
 Automatically infer your function name, description, and parameters given a reference to the function. A `Function` instance is returned which can be converted to JSON schema with `.to_json_schema()` and then passed to the OpenAI chat completion API:
 
 ```python
-def get_current_weather(location: str, unit: str) -> str:
+from typing import Any, Callable
+from openai_function_calling import FunctionInferer
+import openai
+import json
+
+# Define example functions.
+
+def get_current_weather(location: str, unit: str = "fahrenheit") -> str:
     """Get the current weather and return a summary."""
     return f"It is currently sunny in {location} and 75 degrees {unit}."
 
-get_current_weather_json_schema = Function.from_function(get_current_weather).to_json_schema()
+
+def get_tomorrows_weather(location: str, unit: str = "fahrenheit") -> str:
+    """Get the weather for tomorrow and return a summary."""
+    return f"Tomorrow it will be rainy in {location} and 60 degrees {unit}."
+
+# Infer the function definitions.
+get_current_weather_function = FunctionInferer.infer_from_function_reference(
+    get_current_weather
+)
+
+get_tomorrows_weather_function = FunctionInferer.infer_from_function_reference(
+    get_tomorrows_weather
+)
 
 # Get the function to call from ChatGPT (you would normally have more than one).
 response = openai.ChatCompletion.create(
@@ -37,7 +56,11 @@ response = openai.ChatCompletion.create(
             "content": "What will the weather be like in Boston, MA today?",
         }
     ],
-    functions=[get_current_weather_json_schema],
+    functions=[
+        # Convert the functions to JSON schema.
+        get_current_weather_function.to_json_schema(),
+        get_tomorrows_weather_function.to_json_schema(),
+    ],
 )
 ```
 
@@ -73,19 +96,7 @@ get_current_weather_function = Function(
 )
 
 # Convert to a JSON schema dict to send to OpenAI.
-get_current_weather_function_dict = get_current_weather_function.to_json_schema()
-
-# Get the function to call from ChatGPT.
-response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-0613",
-    messages=[
-        {
-            "role": "user",
-            "content": "What will the weather be like in Boston, MA tomorrow?",
-        }
-    ],
-    functions=[get_current_weather_function_dict],
-)
+get_current_weather_function_schema = get_current_weather_function.to_json_schema()
 ```
 
 ## Examples
