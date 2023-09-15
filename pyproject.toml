@@ -9,7 +9,7 @@ include = ["openai_function_calling/py.typed"]
 repository = "https://github.com/jakecyr/openai-function-calling"
 
 [tool.poetry.dependencies]
-python = ">=3.10, <=3.12"
+python = ">=3.9, <=3.12"
 typing-extensions = "^4.0"
 docstring-parser = "^0.15"
 
