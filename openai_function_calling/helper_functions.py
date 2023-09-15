@@ -1,5 +1,7 @@
 """Helper functions used throughout the package."""
 
+from __future__ import annotations
+
 from openai_function_calling.json_schema_type import JsonSchemaType
 
 

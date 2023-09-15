@@ -130,7 +130,7 @@ class Parameter:
         if self.array_item_type is None or self.array_item_type == JsonSchemaType.NULL:
             self.array_item_type = other_parameter.array_item_type
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Test if an object is equivalent to the parameter.
 
         Args:
