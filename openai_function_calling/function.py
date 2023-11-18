@@ -1,11 +1,10 @@
 """Define the Function class and related objects."""
 
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypedDict
 
-from typing_extensions import NotRequired, deprecated
+from typing_extensions import NotRequired, deprecated  # type: ignore[attr-defined]
 
 from openai_function_calling.json_schema_type import JsonSchemaType
 

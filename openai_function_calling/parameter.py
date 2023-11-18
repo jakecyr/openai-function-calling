@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from openai_function_calling.json_schema_type import JsonSchemaType
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from typing_extensions import NotRequired
 
 

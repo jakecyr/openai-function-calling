@@ -1,7 +1,7 @@
-"""Test the function inferer class."""
+"""Test the function inferrer class."""
 
 from openai_function_calling.function import Function
-from openai_function_calling.function_inferer import FunctionInferer
+from openai_function_calling.function_inferrer import FunctionInferrer
 
 
 def fully_documented_sum(a: int, b: int) -> int:
@@ -22,7 +22,7 @@ def no_docstring_sum(a: int, b: int) -> int:
 
 
 def test_infer_from_function_reference_returns_a_function_instance() -> None:
-    function: Function = FunctionInferer.infer_from_function_reference(
+    function: Function = FunctionInferrer.infer_from_function_reference(
         fully_documented_sum
     )
 
@@ -30,7 +30,7 @@ def test_infer_from_function_reference_returns_a_function_instance() -> None:
 
 
 def test_infer_from_function_reference_returns_function_with_name_defined() -> None:
-    function: Function = FunctionInferer.infer_from_function_reference(
+    function: Function = FunctionInferrer.infer_from_function_reference(
         fully_documented_sum
     )
 
@@ -40,7 +40,7 @@ def test_infer_from_function_reference_returns_function_with_name_defined() -> N
 def test_infer_from_function_reference_returns_function_with_description_defined() -> (
     None
 ):
-    function: Function = FunctionInferer.infer_from_function_reference(
+    function: Function = FunctionInferrer.infer_from_function_reference(
         fully_documented_sum
     )
 
@@ -50,7 +50,7 @@ def test_infer_from_function_reference_returns_function_with_description_defined
 def test_infer_from_function_reference_returns_function_with_expected_parameter_count() -> (
     None
 ):
-    function: Function = FunctionInferer.infer_from_function_reference(
+    function: Function = FunctionInferrer.infer_from_function_reference(
         fully_documented_sum
     )
 
@@ -60,7 +60,7 @@ def test_infer_from_function_reference_returns_function_with_expected_parameter_
 def test_infer_from_function_reference_returns_function_with_expected_parameter_attributes() -> (
     None
 ):
-    function: Function = FunctionInferer.infer_from_function_reference(
+    function: Function = FunctionInferrer.infer_from_function_reference(
         fully_documented_sum
     )
 
@@ -78,7 +78,9 @@ def test_infer_from_function_reference_returns_function_with_expected_parameter_
 
 
 def test_infer_from_function_reference_returns_function_with_expected_values() -> None:
-    function: Function = FunctionInferer.infer_from_function_reference(no_docstring_sum)
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        no_docstring_sum
+    )
 
     assert function.name == no_docstring_sum.__name__
     assert len(function.parameters) == 2
