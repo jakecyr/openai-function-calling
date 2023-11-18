@@ -1,9 +1,14 @@
 """Test the tool wrapper class."""
 
+
+from typing import TYPE_CHECKING
+
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
 from openai_function_calling.tool_helpers import ToolHelpers
-from openai.types.chat import ChatCompletionToolParam
+
+if TYPE_CHECKING:
+    from openai.types.chat import ChatCompletionToolParam
 
 
 def get_current_weather(location: str, unit: str) -> str:
@@ -68,3 +73,31 @@ def test_from_functions_dicts_function_parameters_has_expected_type() -> None:
     )[0]
 
     assert isinstance(tool_param["function"]["parameters"], dict)
+
+
+def test_infer_from_function_refs_returns_list() -> None:
+    assert isinstance(ToolHelpers.infer_from_function_refs([get_current_weather]), list)
+
+
+def test_infer_from_function_refs_returns_list_of_dicts() -> None:
+    assert isinstance(
+        ToolHelpers.infer_from_function_refs([get_current_weather])[0],
+        dict,
+    )
+
+
+def test_infer_from_function_refs_dicts_contain_expected_keys() -> None:
+    tool_param: ChatCompletionToolParam = ToolHelpers.infer_from_function_refs(
+        [get_current_weather]
+    )[0]
+
+    assert "type" in tool_param
+    assert "function" in tool_param
+
+
+def test_infer_from_function_refs_dicts_function_is_dict() -> None:
+    tool_param: ChatCompletionToolParam = ToolHelpers.infer_from_function_refs(
+        [get_current_weather]
+    )[0]
+
+    assert isinstance(tool_param["function"], dict)

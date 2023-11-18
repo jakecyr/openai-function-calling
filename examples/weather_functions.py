@@ -7,13 +7,14 @@ and extract entities to pass into the chosen function as arguments.
 import json
 from collections.abc import Callable
 from typing import Any
+
+import openai
 from openai.types.chat import (
     ChatCompletion,
     ChatCompletionMessage,
-    ChatCompletionUserMessageParam,
     ChatCompletionMessageToolCall,
+    ChatCompletionUserMessageParam,
 )
-import openai
 
 from openai_function_calling import Function, JsonSchemaType, Parameter
 from openai_function_calling.tool_helpers import ToolHelpers

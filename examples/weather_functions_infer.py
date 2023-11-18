@@ -7,6 +7,7 @@ and extract entities to pass into the chosen function as arguments.
 import json
 from collections.abc import Callable
 from typing import Any
+
 from openai import OpenAI
 from openai.types.chat import (
     ChatCompletion,
