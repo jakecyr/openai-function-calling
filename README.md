@@ -99,6 +99,45 @@ get_current_weather_function = Function(
 get_current_weather_function_schema = get_current_weather_function.to_json_schema()
 ```
 
+### Convert Functions to OpenAI Compatible JSON
+
+```python
+from openai import OpenAI
+from openai.types.chat import (
+    ChatCompletion,
+    ChatCompletionUserMessageParam,
+)
+from openai_function_calling.tool_helpers import ToolHelpers
+
+
+# Define our functions.
+def get_current_weather(location: str, unit: str) -> str:
+    """Get the current weather and return a summary."""
+    return f"It is currently sunny in {location} and 75 degrees {unit}."
+
+
+def get_tomorrows_weather(location: str, unit: str) -> str:
+    """Get tomorrow's weather and return a summary."""
+    return f"It will be rainy tomorrow in {location} and around 65 degrees {unit}."
+
+
+openai_client = OpenAI()
+
+# Send the query and our function context to OpenAI.
+response: ChatCompletion = openai_client.chat.completions.create(
+    model="gpt-3.5-turbo-1106",
+    messages=[
+        ChatCompletionUserMessageParam(
+            role="user", content="What's the weather in Boston MA?"
+        ),
+    ],
+    tools=ToolHelpers.infer_from_function_refs(
+        [get_current_weather, get_tomorrows_weather]
+    ),
+    tool_choice="auto",
+)
+```
+
 ## Examples
 
 To run the examples, set the environment variable `OPENAI_API_KEY` to your OpenAI API key. For example:
