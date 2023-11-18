@@ -1,4 +1,4 @@
-"""Function inferer class definition."""
+"""Function inferrer class definition."""
 
 import inspect
 from collections.abc import Callable
@@ -12,7 +12,7 @@ from openai_function_calling.helper_functions import python_type_to_json_schema_
 from openai_function_calling.parameter import Parameter
 
 
-class FunctionInferer:
+class FunctionInferrer:
     """Class to help inferring a function definition from a reference."""
 
     @staticmethod
@@ -27,13 +27,13 @@ class FunctionInferer:
         Return:
             An instance of Function with inferred values.
         """
-        inferred_from_annotations: Function = FunctionInferer._infer_from_annotations(
+        inferred_from_annotations: Function = FunctionInferrer._infer_from_annotations(
             function_reference
         )
-        inferred_from_docstring: Function = FunctionInferer._infer_from_docstring(
+        inferred_from_docstring: Function = FunctionInferrer._infer_from_docstring(
             function_reference
         )
-        inferred_from_inspection: Function = FunctionInferer._infer_from_inspection(
+        inferred_from_inspection: Function = FunctionInferrer._infer_from_inspection(
             function_reference
         )
 

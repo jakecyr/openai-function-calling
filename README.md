@@ -23,7 +23,7 @@ Automatically infer your function name, description, and parameters given a refe
 
 ```python
 from typing import Any, Callable
-from openai_function_calling import FunctionInferer
+from openai_function_calling import FunctionInferrer
 import openai
 import json
 
@@ -39,11 +39,11 @@ def get_tomorrows_weather(location: str, unit: str = "fahrenheit") -> str:
     return f"Tomorrow it will be rainy in {location} and 60 degrees {unit}."
 
 # Infer the function definitions.
-get_current_weather_function = FunctionInferer.infer_from_function_reference(
+get_current_weather_function = FunctionInferrer.infer_from_function_reference(
     get_current_weather
 )
 
-get_tomorrows_weather_function = FunctionInferer.infer_from_function_reference(
+get_tomorrows_weather_function = FunctionInferrer.infer_from_function_reference(
     get_tomorrows_weather
 )
 
