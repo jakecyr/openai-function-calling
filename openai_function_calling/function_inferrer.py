@@ -146,6 +146,8 @@ class FunctionInferrer:
                     parameter_type = JsonSchemaType.STRING.value
                     enum_values = list(parameter.annotation._value2member_map_.keys())
 
+                    print(parameter.annotation._value2member_map_.keys())
+
                     function_definition.parameters.append(
                         Parameter(name=name, type=parameter_type, enum=enum_values)
                     )
