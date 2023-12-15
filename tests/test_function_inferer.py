@@ -1,7 +1,30 @@
 """Test the function inferrer class."""
 
+from enum import Enum, auto
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
+
+
+class TemperatureUnit(Enum):
+    CELSIUS = "celsius"
+    FAHRENHEIT = "fahrenheit"
+
+
+class Places(Enum):
+    SAN_FRANCISCO = auto()
+    NEW_YORK = auto()
+
+
+def get_state_from_city(city: Places) -> str:
+    """Get the state from a city.
+
+    Args:
+        city: The city to get the state for.
+
+    Returns:
+        The state of the city.
+    """
+    return "CA"
 
 
 def fully_documented_sum(a: int, b: int) -> int:
@@ -19,6 +42,19 @@ def fully_documented_sum(a: int, b: int) -> int:
 
 def no_docstring_sum(a: int, b: int) -> int:
     return a + b
+
+
+def get_temperature(location: str, unit: TemperatureUnit) -> float:
+    """Get the current temperature.
+
+    Args:
+        location: The location to get the temperature for.
+        unit: The unit to return the temperature in.
+
+    Returns:
+        The current temperature in the specified unit.
+    """
+    return 75
 
 
 def test_infer_from_function_reference_returns_a_function_instance() -> None:
@@ -88,3 +124,15 @@ def test_infer_from_function_reference_returns_function_with_expected_values() -
     assert function.parameters[0].type == "integer"
     assert function.parameters[1].name == "b"
     assert function.parameters[1].type == "integer"
+
+
+def test_infer_from_function_reference_with_enum_returns_function_with_enum() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(get_temperature)
+    assert function.parameters[1].enum == ["celsius", "fahrenheit"]
+
+
+def test_infer_from_function_reference_with_enum_returns_correct_value_type() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        get_state_from_city
+    )
+    assert function.parameters[0].type == "number"

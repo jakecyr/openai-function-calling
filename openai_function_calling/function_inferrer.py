@@ -1,7 +1,10 @@
 """Function inferrer class definition."""
 
+from enum import EnumMeta
 import inspect
+
 from collections.abc import Callable
+import pprint
 from typing import Any
 from warnings import warn
 
@@ -9,6 +12,7 @@ from docstring_parser import Docstring, parser
 
 from openai_function_calling.function import Function
 from openai_function_calling.helper_functions import python_type_to_json_schema_type
+from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
 
 
@@ -135,6 +139,17 @@ class FunctionInferrer:
 
         for name, parameter in inspected_parameters.items():
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
+            enum_values: list[str] | None = None
+
+            if parameter_type == "null":
+                if isinstance(parameter.annotation, EnumMeta):
+                    parameter_type = JsonSchemaType.STRING.value
+                    enum_values = list(parameter.annotation._value2member_map_.keys())
+
+                    function_definition.parameters.append(
+                        Parameter(name=name, type=parameter_type, enum=enum_values)
+                    )
+                    continue
 
             function_definition.parameters.append(
                 Parameter(name=name, type=parameter_type)
