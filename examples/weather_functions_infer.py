@@ -4,9 +4,9 @@ Uses the function calling wrappers to decide between two functions
 and extract entities to pass into the chosen function as arguments.
 """
 
-from enum import Enum
 import json
 from collections.abc import Callable
+from enum import Enum
 from typing import Any
 
 from openai import OpenAI

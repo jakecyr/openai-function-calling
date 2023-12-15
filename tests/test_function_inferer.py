@@ -1,6 +1,7 @@
 """Test the function inferrer class."""
 
 from enum import Enum, auto
+
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
 from openai_function_calling.json_schema_type import JsonSchemaType

@@ -1,11 +1,9 @@
 """Function inferrer class definition."""
 
-from enum import EnumMeta
 import inspect
-
 from collections.abc import Callable
-import pprint
-from typing import Any
+from enum import EnumMeta
+from typing import Any, Optional
 from warnings import warn
 
 from docstring_parser import Docstring, parser
@@ -139,7 +137,7 @@ class FunctionInferrer:
 
         for name, parameter in inspected_parameters.items():
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
-            enum_values: list[str] | None = None
+            enum_values: Optional[list[str]] = None
 
             if parameter_type == "null":
                 if isinstance(parameter.annotation, EnumMeta):
@@ -167,7 +165,7 @@ class FunctionInferrer:
             return JsonSchemaType.NULL.value
 
         # check if all items are the same type.
-        if len(set([type(item).__name__ for item in list_of_items])) == 1:
+        if len({type(item).__name__ for item in list_of_items}) == 1:
             item: Any = type(list_of_items[0]).__name__
             return python_type_to_json_schema_type(item)
 
