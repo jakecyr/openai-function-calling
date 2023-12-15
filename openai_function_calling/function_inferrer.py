@@ -146,10 +146,12 @@ class FunctionInferrer:
                     parameter_type = JsonSchemaType.STRING.value
                     enum_values = list(parameter.annotation._value2member_map_.keys())
 
-                    print(parameter.annotation._value2member_map_.keys())
-
                     function_definition.parameters.append(
-                        Parameter(name=name, type=parameter_type, enum=enum_values)
+                        Parameter(
+                            name=name,
+                            type=FunctionInferrer._infer_list_item_type(enum_values),
+                            enum=enum_values,
+                        )
                     )
                     continue
 
@@ -158,3 +160,15 @@ class FunctionInferrer:
             )
 
         return function_definition
+
+    @staticmethod
+    def _infer_list_item_type(list_of_items: list[Any]) -> str:
+        if len(list_of_items) == 0:
+            return JsonSchemaType.NULL.value
+
+        # check if all items are the same type.
+        if len(set([type(item).__name__ for item in list_of_items])) == 1:
+            item: Any = type(list_of_items[0]).__name__
+            return python_type_to_json_schema_type(item)
+
+        return JsonSchemaType.ANY.value

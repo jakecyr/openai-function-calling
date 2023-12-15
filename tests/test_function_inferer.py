@@ -3,6 +3,7 @@
 from enum import Enum, auto
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
+from openai_function_calling.json_schema_type import JsonSchemaType
 
 
 class TemperatureUnit(Enum):
@@ -135,4 +136,4 @@ def test_infer_from_function_reference_with_enum_returns_correct_value_type() ->
     function: Function = FunctionInferrer.infer_from_function_reference(
         get_state_from_city
     )
-    assert function.parameters[0].type == "number"
+    assert function.parameters[0].type == JsonSchemaType.INTEGER.value
