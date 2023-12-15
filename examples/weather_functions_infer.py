@@ -6,6 +6,7 @@ and extract entities to pass into the chosen function as arguments.
 
 import json
 from collections.abc import Callable
+from enum import Enum
 from typing import Any
 
 from openai import OpenAI
@@ -21,8 +22,15 @@ from openai.types.chat.chat_completion_message_tool_call import (
 from openai_function_calling.tool_helpers import ToolHelpers
 
 
+class TemperatureUnit(Enum):
+    """Temperature units."""
+
+    CELSIUS = "celsius"
+    FAHRENHEIT = "fahrenheit"
+
+
 # Define our functions.
-def get_current_weather(location: str, unit: str) -> str:
+def get_current_weather(location: str, unit: TemperatureUnit) -> str:
     """Get the current weather and return a summary."""
     return f"It is currently sunny in {location} and 75 degrees {unit}."
 

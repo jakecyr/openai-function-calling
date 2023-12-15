@@ -1,15 +1,22 @@
 """Function inferrer class definition."""
 
+from __future__ import annotations
+
+import dataclasses
 import inspect
-from collections.abc import Callable
-from typing import Any
+from enum import EnumMeta
+from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 from docstring_parser import Docstring, parser
 
 from openai_function_calling.function import Function
 from openai_function_calling.helper_functions import python_type_to_json_schema_type
+from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class FunctionInferrer:
@@ -135,9 +142,31 @@ class FunctionInferrer:
 
         for name, parameter in inspected_parameters.items():
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
+            enum_values: list[str] | None = None
+
+            if parameter_type == "null":
+                if isinstance(parameter.annotation, EnumMeta):
+                    enum_values = list(
+                        parameter.annotation._value2member_map_.keys()  # noqa: SLF001
+                    )
+                    parameter_type = FunctionInferrer._infer_list_item_type(enum_values)
+                elif dataclasses.is_dataclass(parameter.annotation):
+                    parameter_type = JsonSchemaType.OBJECT.value
 
             function_definition.parameters.append(
-                Parameter(name=name, type=parameter_type)
+                Parameter(name=name, type=parameter_type, enum=enum_values)
             )
 
         return function_definition
+
+    @staticmethod
+    def _infer_list_item_type(list_of_items: list[Any]) -> str:
+        if len(list_of_items) == 0:
+            return JsonSchemaType.NULL.value
+
+        # check if all items are the same type.
+        if len({type(item).__name__ for item in list_of_items}) == 1:
+            item: Any = type(list_of_items[0]).__name__
+            return python_type_to_json_schema_type(item)
+
+        return JsonSchemaType.ANY.value
