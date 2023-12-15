@@ -1,9 +1,11 @@
 """Function inferrer class definition."""
 
+from __future__ import annotations
+
+import dataclasses
 import inspect
-from collections.abc import Callable
 from enum import EnumMeta
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 from docstring_parser import Docstring, parser
@@ -12,6 +14,9 @@ from openai_function_calling.function import Function
 from openai_function_calling.helper_functions import python_type_to_json_schema_type
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class FunctionInferrer:
@@ -137,24 +142,19 @@ class FunctionInferrer:
 
         for name, parameter in inspected_parameters.items():
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
-            enum_values: Optional[list[str]] = None
+            enum_values: list[str] | None = None
 
             if parameter_type == "null":
                 if isinstance(parameter.annotation, EnumMeta):
-                    parameter_type = JsonSchemaType.STRING.value
-                    enum_values = list(parameter.annotation._value2member_map_.keys())
-
-                    function_definition.parameters.append(
-                        Parameter(
-                            name=name,
-                            type=FunctionInferrer._infer_list_item_type(enum_values),
-                            enum=enum_values,
-                        )
+                    enum_values = list(
+                        parameter.annotation._value2member_map_.keys()  # noqa: SLF001
                     )
-                    continue
+                    parameter_type = FunctionInferrer._infer_list_item_type(enum_values)
+                elif dataclasses.is_dataclass(parameter.annotation):
+                    parameter_type = JsonSchemaType.OBJECT.value
 
             function_definition.parameters.append(
-                Parameter(name=name, type=parameter_type)
+                Parameter(name=name, type=parameter_type, enum=enum_values)
             )
 
         return function_definition

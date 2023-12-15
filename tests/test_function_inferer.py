@@ -1,5 +1,6 @@
 """Test the function inferrer class."""
 
+from dataclasses import dataclass
 from enum import Enum, auto
 
 from openai_function_calling.function import Function
@@ -15,6 +16,20 @@ class TemperatureUnit(Enum):
 class Places(Enum):
     SAN_FRANCISCO = auto()
     NEW_YORK = auto()
+
+
+@dataclass
+class Location:
+    city: Places
+    state: str
+
+
+def add_location(location: Location) -> None:
+    """Add a location to the database.
+
+    Args:
+        location: The location to add to the database.
+    """
 
 
 def get_state_from_city(city: Places) -> str:
@@ -138,3 +153,8 @@ def test_infer_from_function_reference_with_enum_returns_correct_value_type() ->
         get_state_from_city
     )
     assert function.parameters[0].type == JsonSchemaType.INTEGER.value
+
+
+def test_infer_from_function_reference_with_dataclass_sets_as_object() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(add_location)
+    assert function.parameters[0].type == JsonSchemaType.OBJECT.value
