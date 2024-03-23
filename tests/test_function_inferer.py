@@ -1,7 +1,79 @@
 """Test the function inferrer class."""
 
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import List  # noqa: UP035
+
+import pytest
+
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
+from openai_function_calling.json_schema_type import JsonSchemaType
+
+
+class TemperatureUnit(Enum):
+    CELSIUS = "celsius"
+    FAHRENHEIT = "fahrenheit"
+
+
+class Places(Enum):
+    SAN_FRANCISCO = auto()
+    NEW_YORK = auto()
+
+
+@dataclass
+class Location:
+    city: Places
+    state: str
+
+
+def add_location(location: Location) -> None:
+    """Add a location to the database.
+
+    Args:
+        location: The location to add to the database.
+
+    """
+
+
+def add_locations(locations: list[dict]) -> None:
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
+
+    """
+
+
+def add_generic_locations(locations: list) -> None:
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
+
+    """
+
+
+def add_generic_typing_locations(locations: List) -> None:  # noqa: UP006
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
+
+    """
+
+
+def get_state_from_city(city: Places) -> str:
+    """Get the state from a city.
+
+    Args:
+        city: The city to get the state for.
+
+    Returns:
+        The state of the city.
+
+    """
+    return "CA"
 
 
 def fully_documented_sum(a: int, b: int) -> int:
@@ -13,12 +85,27 @@ def fully_documented_sum(a: int, b: int) -> int:
 
     Returns:
         The sum of the two values.
+
     """
     return a + b
 
 
 def no_docstring_sum(a: int, b: int) -> int:
     return a + b
+
+
+def get_temperature(location: str, unit: TemperatureUnit) -> float:
+    """Get the current temperature.
+
+    Args:
+        location: The location to get the temperature for.
+        unit: The unit to return the temperature in.
+
+    Returns:
+        The current temperature in the specified unit.
+
+    """
+    return 75
 
 
 def test_infer_from_function_reference_returns_a_function_instance() -> None:
@@ -88,3 +175,46 @@ def test_infer_from_function_reference_returns_function_with_expected_values() -
     assert function.parameters[0].type == "integer"
     assert function.parameters[1].name == "b"
     assert function.parameters[1].type == "integer"
+
+
+def test_infer_from_function_reference_with_enum_returns_function_with_enum() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(get_temperature)
+    assert function.parameters[1].enum == ["celsius", "fahrenheit"]
+
+
+def test_infer_from_function_reference_with_enum_returns_correct_value_type() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        get_state_from_city
+    )
+    assert function.parameters[0].type == JsonSchemaType.INTEGER.value
+
+
+def test_infer_from_function_reference_with_dataclass_sets_as_object() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(add_location)
+    assert function.parameters[0].type == JsonSchemaType.OBJECT.value
+
+
+def test_infer_from_function_reference_with_primitive_list_parameter_returns_expected_type() -> (
+    None
+):
+    function: Function = FunctionInferrer.infer_from_function_reference(add_locations)
+    assert function.parameters[0].type == JsonSchemaType.ARRAY.value
+    assert function.parameters[0].array_item_type == JsonSchemaType.OBJECT.value
+
+
+def test_infer_from_function_reference_with_generic_primitive_list_parameter_raises_value_error() -> (
+    None
+):
+    with pytest.raises(
+        ValueError, match="Expected array parameter 'locations' to have an item type."
+    ):
+        FunctionInferrer.infer_from_function_reference(add_generic_locations)
+
+
+def test_infer_from_function_reference_with_typing_list_parameter_raises_value_error() -> (
+    None
+):
+    with pytest.raises(
+        ValueError, match="Expected array parameter 'locations' to have an item type."
+    ):
+        FunctionInferrer.infer_from_function_reference(add_generic_typing_locations)

@@ -1,15 +1,23 @@
 """Function inferrer class definition."""
 
+from __future__ import annotations
+
+import dataclasses
 import inspect
-from collections.abc import Callable
-from typing import Any
+import typing
+from enum import EnumMeta
+from typing import TYPE_CHECKING, Any, get_args, get_origin, get_type_hints
 from warnings import warn
 
 from docstring_parser import Docstring, parser
 
 from openai_function_calling.function import Function
 from openai_function_calling.helper_functions import python_type_to_json_schema_type
+from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
+
+if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Callable
 
 
 class FunctionInferrer:
@@ -26,6 +34,7 @@ class FunctionInferrer:
 
         Return:
             An instance of Function with inferred values.
+
         """
         inferred_from_annotations: Function = FunctionInferrer._infer_from_annotations(
             function_reference
@@ -51,6 +60,7 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
         function_definition = Function(
             name=function_reference.__name__,
@@ -91,29 +101,53 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
-        function_definition = Function(
+        annotations: dict[str, Any] = get_type_hints(function_reference)
+        parameters: list[Parameter] = []
+
+        for param_name, annotation_type in annotations.items():
+            if param_name == "return":
+                continue
+
+            origin = get_origin(annotation_type) or annotation_type
+            args: tuple[Any, ...] = get_args(annotation_type)
+
+            if origin in [list, typing.List]:  # noqa: UP006
+                if not args:
+                    raise ValueError(
+                        f"Expected array parameter '{param_name}' to have an item type."
+                    )
+                item_type = args[0]
+                parameter_type = JsonSchemaType.ARRAY.value
+                array_item_type = python_type_to_json_schema_type(
+                    item_type.__name__ if hasattr(item_type, "__name__") else "Any"
+                )
+            elif origin in [dict, typing.Dict]:  # noqa: UP006
+                parameter_type = JsonSchemaType.OBJECT.value
+                array_item_type = None
+            else:
+                parameter_type = python_type_to_json_schema_type(
+                    annotation_type.__name__
+                    if hasattr(annotation_type, "__name__")
+                    else "Any"
+                )
+
+                array_item_type = None
+
+            parameters.append(
+                Parameter(
+                    name=param_name,
+                    type=parameter_type,
+                    array_item_type=array_item_type,
+                )
+            )
+
+        return Function(
             name=function_reference.__name__,
             description="",
-            parameters=[],
+            parameters=parameters,
         )
-
-        if hasattr(function_reference, "__annotations__"):
-            annotations: dict[str, Any] = function_reference.__annotations__
-
-            for key in annotations:
-                if key == "return":
-                    continue
-
-                parameter_type: str = python_type_to_json_schema_type(
-                    annotations[key].__name__,
-                )
-
-                function_definition.parameters.append(
-                    Parameter(name=key, type=parameter_type)
-                )
-
-        return function_definition
 
     @staticmethod
     def _infer_from_inspection(function_reference: Callable) -> Function:
@@ -124,6 +158,7 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
         function_definition = Function(
             name=function_reference.__name__,
@@ -135,9 +170,31 @@ class FunctionInferrer:
 
         for name, parameter in inspected_parameters.items():
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
+            enum_values: list[str] | None = None
+
+            if parameter_type == "null":
+                if isinstance(parameter.annotation, EnumMeta):
+                    enum_values = list(
+                        parameter.annotation._value2member_map_.keys()  # noqa: SLF001
+                    )
+                    parameter_type = FunctionInferrer._infer_list_item_type(enum_values)
+                elif dataclasses.is_dataclass(parameter.annotation):
+                    parameter_type = JsonSchemaType.OBJECT.value
 
             function_definition.parameters.append(
-                Parameter(name=name, type=parameter_type)
+                Parameter(name=name, type=parameter_type, enum=enum_values)
             )
 
         return function_definition
+
+    @staticmethod
+    def _infer_list_item_type(list_of_items: list[Any]) -> str:
+        if len(list_of_items) == 0:
+            return JsonSchemaType.NULL.value
+
+        # Check if all items are the same type.
+        if len({type(item).__name__ for item in list_of_items}) == 1:
+            item: Any = type(list_of_items[0]).__name__
+            return python_type_to_json_schema_type(item)
+
+        return JsonSchemaType.ANY.value

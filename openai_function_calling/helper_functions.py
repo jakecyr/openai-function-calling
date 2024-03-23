@@ -13,6 +13,7 @@ def python_type_to_json_schema_type(python_type: str | None) -> str:
 
     Returns:
         A JSON schema type value.
+
     """
     json_schema_type: str = JsonSchemaType.NULL.value
 

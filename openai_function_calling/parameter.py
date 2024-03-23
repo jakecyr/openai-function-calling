@@ -52,6 +52,7 @@ class Parameter:
                 is not set.
             ValueError: If the 'array_item_type' argument is set, but the 'type' is not\
                 'array'.
+
         """
         self.name: str = name
         self.type: str = type
@@ -67,6 +68,7 @@ class Parameter:
         Raises:
             ValueError: If 'array_item_type' is not set, but 'type' is array.
             ValueError: If 'array_item_type' is set, but 'type' is not array.
+
         """
         if self.type == JsonSchemaType.ARRAY and self.array_item_type is None:
             raise ValueError(
@@ -86,6 +88,7 @@ class Parameter:
 
         Raises:
             ValueError: If there are validation errors. See the validate method.
+
         """
         self.validate()
 
@@ -111,6 +114,7 @@ class Parameter:
 
         Args:
             other_parameter: The other parameter instance to merge into the current.
+
         """
         if not isinstance(other_parameter, Parameter):
             raise TypeError("Cannot merge non-parameter type into parameter.")
@@ -138,6 +142,7 @@ class Parameter:
 
         Returns:
             If the other object is equal to the current instance.
+
         """
         if not isinstance(other, Parameter):
             return False

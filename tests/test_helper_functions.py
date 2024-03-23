@@ -1,6 +1,5 @@
 """Helper function tests."""
 
-
 import pytest
 
 from openai_function_calling.helper_functions import python_type_to_json_schema_type
