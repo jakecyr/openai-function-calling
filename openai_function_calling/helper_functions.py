@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
-
 from openai_function_calling.json_schema_type import JsonSchemaType
 
 
@@ -33,7 +31,7 @@ def python_type_to_json_schema_type(python_type: str | None) -> str:
     if python_type == "bool":
         json_schema_type = JsonSchemaType.BOOLEAN.value
 
-    if python_type == "dict" or inspect.isclass(python_type):
+    if python_type == "dict":
         json_schema_type = JsonSchemaType.OBJECT.value
 
     if python_type == "list":
