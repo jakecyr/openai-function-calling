@@ -6,7 +6,7 @@ import dataclasses
 import inspect
 import typing
 from enum import EnumMeta
-from typing import TYPE_CHECKING, Any, get_args
+from typing import TYPE_CHECKING, Any, get_args, get_origin, get_type_hints
 from warnings import warn
 
 from docstring_parser import Docstring, parser
@@ -16,7 +16,7 @@ from openai_function_calling.helper_functions import python_type_to_json_schema_
 from openai_function_calling.json_schema_type import JsonSchemaType
 from openai_function_calling.parameter import Parameter
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
 
@@ -103,49 +103,51 @@ class FunctionInferrer:
             The inferred Function instance.
 
         """
-        function_definition = Function(
+        annotations: dict[str, Any] = get_type_hints(function_reference)
+        parameters: list[Parameter] = []
+
+        for param_name, annotation_type in annotations.items():
+            if param_name == "return":
+                continue
+
+            origin = get_origin(annotation_type) or annotation_type
+            args: tuple[Any, ...] = get_args(annotation_type)
+
+            if origin in [list, typing.List]:  # noqa: UP006
+                if not args:
+                    raise ValueError(
+                        f"Expected array parameter '{param_name}' to have an item type."
+                    )
+                item_type = args[0]
+                parameter_type = JsonSchemaType.ARRAY.value
+                array_item_type = python_type_to_json_schema_type(
+                    item_type.__name__ if hasattr(item_type, "__name__") else "Any"
+                )
+            elif origin in [dict, typing.Dict]:  # noqa: UP006
+                parameter_type = JsonSchemaType.OBJECT.value
+                array_item_type = None
+            else:
+                parameter_type = python_type_to_json_schema_type(
+                    annotation_type.__name__
+                    if hasattr(annotation_type, "__name__")
+                    else "Any"
+                )
+
+                array_item_type = None
+
+            parameters.append(
+                Parameter(
+                    name=param_name,
+                    type=parameter_type,
+                    array_item_type=array_item_type,
+                )
+            )
+
+        return Function(
             name=function_reference.__name__,
             description="",
-            parameters=[],
+            parameters=parameters,
         )
-
-        if hasattr(function_reference, "__annotations__"):
-            annotations: dict[str, Any] = function_reference.__annotations__
-
-            for key in annotations:
-                if key == "return":
-                    continue
-
-                annotation_type = annotations[key]
-                parameter_type: str = python_type_to_json_schema_type(
-                    annotation_type.__name__
-                )
-                array_item_type: str | None = None
-
-                if (
-                    parameter_type == JsonSchemaType.ARRAY.value
-                    or annotation_type == typing.List  # noqa: UP006
-                ):
-                    args = get_args(annotation_type)
-                    if args:
-                        if dataclasses.is_dataclass(args[0]):
-                            array_item_type = JsonSchemaType.OBJECT.value
-                        else:
-                            array_item_type = python_type_to_json_schema_type(
-                                args[0].__name__
-                            )
-                    else:
-                        raise ValueError(
-                            f"Expected array parameter '{key}' to have an item type.",
-                        )
-
-                function_definition.parameters.append(
-                    Parameter(
-                        name=key, type=parameter_type, array_item_type=array_item_type
-                    )
-                )
-
-        return function_definition
 
     @staticmethod
     def _infer_from_inspection(function_reference: Callable) -> Function:
