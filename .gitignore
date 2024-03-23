@@ -7,3 +7,4 @@ dist
 .coverage
 htmlcov
 .mypy_cache
+.python-version

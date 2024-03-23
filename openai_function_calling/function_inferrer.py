@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import dataclasses
 import inspect
+import typing
 from enum import EnumMeta
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, get_args
 from warnings import warn
 
 from docstring_parser import Docstring, parser
@@ -112,12 +113,33 @@ class FunctionInferrer:
                 if key == "return":
                     continue
 
+                annotation_type = annotations[key]
                 parameter_type: str = python_type_to_json_schema_type(
-                    annotations[key].__name__,
+                    annotation_type.__name__
                 )
+                array_item_type: str | None = None
+
+                if (
+                    parameter_type == JsonSchemaType.ARRAY.value
+                    or annotation_type == typing.List  # noqa: UP006
+                ):
+                    args = get_args(annotation_type)
+                    if args:
+                        if dataclasses.is_dataclass(args[0]):
+                            array_item_type = JsonSchemaType.OBJECT.value
+                        else:
+                            array_item_type = python_type_to_json_schema_type(
+                                args[0].__name__
+                            )
+                    else:
+                        raise ValueError(
+                            f"Expected array parameter '{key}' to have an item type.",
+                        )
 
                 function_definition.parameters.append(
-                    Parameter(name=key, type=parameter_type)
+                    Parameter(
+                        name=key, type=parameter_type, array_item_type=array_item_type
+                    )
                 )
 
         return function_definition
@@ -164,7 +186,7 @@ class FunctionInferrer:
         if len(list_of_items) == 0:
             return JsonSchemaType.NULL.value
 
-        # check if all items are the same type.
+        # Check if all items are the same type.
         if len({type(item).__name__ for item in list_of_items}) == 1:
             item: Any = type(list_of_items[0]).__name__
             return python_type_to_json_schema_type(item)

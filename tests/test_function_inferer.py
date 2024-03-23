@@ -2,6 +2,9 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import List  # noqa: UP035
+
+import pytest
 
 from openai_function_calling.function import Function
 from openai_function_calling.function_inferrer import FunctionInferrer
@@ -29,6 +32,30 @@ def add_location(location: Location) -> None:
 
     Args:
         location: The location to add to the database.
+    """
+
+
+def add_locations(locations: list[dict]) -> None:
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
+    """
+
+
+def add_generic_locations(locations: list) -> None:
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
+    """
+
+
+def add_generic_typing_locations(locations: List) -> None:  # noqa: UP006
+    """Add a locations to the database.
+
+    Args:
+        locations: The list of locations to add.
     """
 
 
@@ -158,3 +185,29 @@ def test_infer_from_function_reference_with_enum_returns_correct_value_type() ->
 def test_infer_from_function_reference_with_dataclass_sets_as_object() -> None:
     function: Function = FunctionInferrer.infer_from_function_reference(add_location)
     assert function.parameters[0].type == JsonSchemaType.OBJECT.value
+
+
+def test_infer_from_function_reference_with_primitive_list_parameter_returns_expected_type() -> (
+    None
+):
+    function: Function = FunctionInferrer.infer_from_function_reference(add_locations)
+    assert function.parameters[0].type == JsonSchemaType.ARRAY.value
+    assert function.parameters[0].array_item_type == JsonSchemaType.OBJECT.value
+
+
+def test_infer_from_function_reference_with_generic_primitive_list_parameter_raises_value_error() -> (
+    None
+):
+    with pytest.raises(
+        ValueError, match="Expected array parameter 'locations' to have an item type."
+    ):
+        FunctionInferrer.infer_from_function_reference(add_generic_locations)
+
+
+def test_infer_from_function_reference_with_typing_list_parameter_raises_value_error() -> (
+    None
+):
+    with pytest.raises(
+        ValueError, match="Expected array parameter 'locations' to have an item type."
+    ):
+        FunctionInferrer.infer_from_function_reference(add_generic_typing_locations)
