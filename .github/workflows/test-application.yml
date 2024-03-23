@@ -30,7 +30,7 @@ jobs:
           poetry run ruff check .
       - name: Check formatting with black
         run: |
-          poetry run black --check .
+          poetry run ruff format --check .
       - name: Test Coverage
         run: |
           poetry run coverage run --source openai_function_calling -m pytest
