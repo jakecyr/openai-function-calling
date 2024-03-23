@@ -46,6 +46,7 @@ class Function:
             parameters: A list of parameters.
             required_parameters: A list of parameter names that are required to run the\
                 function.
+
         """
         self.name: str = name
         self.description: str = description
@@ -80,6 +81,7 @@ class Function:
 
         Returns:
             A JSON schema representation of the function.
+
         """
         return self.to_json_schema()
 
@@ -91,6 +93,7 @@ class Function:
 
         Returns:
             A JSON schema representation of the function.
+
         """
         self.validate()
 
@@ -119,6 +122,7 @@ class Function:
 
         Args:
             other_function: The other function to merge into the current.
+
         """
         if not self.name:
             self.name = other_function.name

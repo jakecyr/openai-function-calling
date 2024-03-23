@@ -26,6 +26,7 @@ class ToolHelpers:
 
         Returns:
             A list of OpenAI chat completion tool parameters.
+
         """
         json_schemas: list[FunctionDict] = [f.to_json_schema() for f in functions]
         tool_params: list[ChatCompletionToolParam] = [
@@ -45,6 +46,7 @@ class ToolHelpers:
 
         Returns:
             A list of OpenAI chat completion tool parameters.
+
         """
         functions: list[Function] = [
             FunctionInferrer.infer_from_function_reference(f) for f in function_refs
@@ -60,5 +62,6 @@ class ToolHelpers:
 
         Returns:
             An OpenAI chat completion tool parameter.
+
         """
         return {"type": "function", "function": cast(FunctionDefinition, json_schema)}

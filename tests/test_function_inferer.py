@@ -32,6 +32,7 @@ def add_location(location: Location) -> None:
 
     Args:
         location: The location to add to the database.
+
     """
 
 
@@ -40,6 +41,7 @@ def add_locations(locations: list[dict]) -> None:
 
     Args:
         locations: The list of locations to add.
+
     """
 
 
@@ -48,6 +50,7 @@ def add_generic_locations(locations: list) -> None:
 
     Args:
         locations: The list of locations to add.
+
     """
 
 
@@ -56,6 +59,7 @@ def add_generic_typing_locations(locations: List) -> None:  # noqa: UP006
 
     Args:
         locations: The list of locations to add.
+
     """
 
 
@@ -67,6 +71,7 @@ def get_state_from_city(city: Places) -> str:
 
     Returns:
         The state of the city.
+
     """
     return "CA"
 
@@ -80,6 +85,7 @@ def fully_documented_sum(a: int, b: int) -> int:
 
     Returns:
         The sum of the two values.
+
     """
     return a + b
 
@@ -97,6 +103,7 @@ def get_temperature(location: str, unit: TemperatureUnit) -> float:
 
     Returns:
         The current temperature in the specified unit.
+
     """
     return 75
 

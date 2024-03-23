@@ -34,6 +34,7 @@ class FunctionInferrer:
 
         Return:
             An instance of Function with inferred values.
+
         """
         inferred_from_annotations: Function = FunctionInferrer._infer_from_annotations(
             function_reference
@@ -59,6 +60,7 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
         function_definition = Function(
             name=function_reference.__name__,
@@ -99,6 +101,7 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
         function_definition = Function(
             name=function_reference.__name__,
@@ -153,6 +156,7 @@ class FunctionInferrer:
 
         Returns:
             The inferred Function instance.
+
         """
         function_definition = Function(
             name=function_reference.__name__,

@@ -1,6 +1,5 @@
 """Test the tool wrapper class."""
 
-
 from typing import TYPE_CHECKING
 
 from openai_function_calling.function import Function

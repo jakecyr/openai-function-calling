@@ -12,9 +12,6 @@ python = ">=3.9, <=3.12"
 typing-extensions = "^4.7.1"
 docstring-parser = "^0.15"
 
-[tool.poetry.group.dev]
-optional = true
-
 [tool.poetry.group.dev.dependencies]
 openai = "^1.3.2"
 pytest = "^7.4.3"

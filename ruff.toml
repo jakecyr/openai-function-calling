@@ -1,6 +1,6 @@
 line-length = 88
 target-version = "py39"
-select = [
+lint.select = [
   "E",
   "F",
   "B",
@@ -39,7 +39,7 @@ select = [
   "PLW",
   "RUF",
 ]
-fixable = [
+lint.fixable = [
   "A",
   "B",
   "C",
@@ -85,7 +85,7 @@ fixable = [
   "UP",
   "YTT",
 ]
-ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913", "ANN401"]
+lint.ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913", "ANN401"]
 exclude = [
   ".bzr",
   ".direnv",
@@ -100,7 +100,7 @@ exclude = [
   "venv",
   ".venv",
 ]
-[per-file-ignores]
+[lint.per-file-ignores]
 "tests/*" = [
   "D103",
   "S101",
