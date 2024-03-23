@@ -6,7 +6,6 @@ authors = ["Jake Cyr <cyrjake@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/jakecyr/openai-function-calling"
 packages = [{ include = "openai_function_calling" }]
-include = ["openai_function_calling/py.typed"]
 
 [tool.poetry.dependencies]
 python = ">=3.9, <=3.12"
