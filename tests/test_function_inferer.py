@@ -6,8 +6,8 @@ from typing import List  # noqa: UP035
 
 import pytest
 
+from openai_function_calling import FunctionInferrer
 from openai_function_calling.function import Function
-from openai_function_calling.function_inferrer import FunctionInferrer
 from openai_function_calling.json_schema_type import JsonSchemaType
 
 
