@@ -8,7 +8,7 @@ repository = "https://github.com/jakecyr/openai-function-calling"
 packages = [{ include = "openai_function_calling" }]
 
 [tool.poetry.dependencies]
-python = ">=3.9, <=3.12"
+python = ">=3.9, <3.13"
 typing-extensions = "^4.7.1"
 docstring-parser = "^0.15"
 
