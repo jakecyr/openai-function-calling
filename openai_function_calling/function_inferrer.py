@@ -172,6 +172,9 @@ class FunctionInferrer:
             parameter_type: str = python_type_to_json_schema_type(parameter.kind.name)
             enum_values: list[str] | None = None
 
+            if parameter.default is inspect.Parameter.empty:
+                function_definition.required_parameters.append(name)
+
             if parameter_type == "null":
                 if isinstance(parameter.annotation, EnumMeta):
                     enum_values = list(
