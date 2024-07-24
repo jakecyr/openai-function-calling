@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List  # noqa: UP035
+from typing import Optional
 
 import pytest
 
@@ -54,7 +54,7 @@ def add_generic_locations(locations: list) -> None:
     """
 
 
-def add_generic_typing_locations(locations: List) -> None:  # noqa: UP006
+def add_generic_typing_locations(locations: list) -> None:
     """Add a locations to the database.
 
     Args:
@@ -106,6 +106,55 @@ def get_temperature(location: str, unit: TemperatureUnit) -> float:
 
     """
     return 75
+
+
+def get_temperature_with_default(
+    location: str,
+    unit: TemperatureUnit = TemperatureUnit.CELSIUS,
+) -> float:
+    """Get the current temperature.
+
+    Args:
+        location: The location to get the temperature for.
+        unit: The unit to return the temperature in.
+
+    Returns:
+        The current temperature in the specified unit.
+
+    """
+    return 75
+
+
+def get_temperature_with_all_defaults(
+    location: str = "Boston, MA",
+    unit: TemperatureUnit = TemperatureUnit.CELSIUS,
+) -> float:
+    """Get the current temperature.
+
+    Args:
+        location: The location to get the temperature for.
+        unit: The unit to return the temperature in.
+
+    Returns:
+        The current temperature in the specified unit.
+
+    """
+    return 75
+
+
+def get_local_places_with_optional_location(
+    location: Optional[str] = None,  # noqa: FA100
+) -> list:
+    """Get the current temperature.
+
+    Args:
+        location: The location to get the temperature for.
+
+    Returns:
+        The current temperature in the specified unit.
+
+    """
+    return []
 
 
 def test_infer_from_function_reference_returns_a_function_instance() -> None:
@@ -218,3 +267,38 @@ def test_infer_from_function_reference_with_typing_list_parameter_raises_value_e
         ValueError, match="Expected array parameter 'locations' to have an item type."
     ):
         FunctionInferrer.infer_from_function_reference(add_generic_typing_locations)
+
+
+def test_infer_from_function_reference_adds_expected_required_parameters() -> None:
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        get_temperature_with_default
+    )
+
+    assert function.required_parameters == ["location"]
+
+
+def test_infer_from_function_reference_with_no_defaults_returns_required_parameters() -> (
+    None
+):
+    function: Function = FunctionInferrer.infer_from_function_reference(get_temperature)
+
+    assert set(function.required_parameters) == {"unit", "location"}
+
+
+def test_infer_from_function_reference_with_all_defaults_returns_no_required_parameters() -> (
+    None
+):
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        get_temperature_with_all_defaults
+    )
+
+    assert len(function.required_parameters) == 0
+
+
+def test_infer_from_function_reference_with_optional_parameters_not_included_in_required() -> (
+    None
+):
+    function: Function = FunctionInferrer.infer_from_function_reference(
+        get_local_places_with_optional_location
+    )
+    assert function.required_parameters == []
