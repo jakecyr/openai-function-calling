@@ -26,6 +26,7 @@ class FunctionDict(TypedDict):
     name: str
     description: str
     parameters: ParametersDict
+    strict: NotRequired[bool]
 
 
 class Function:
@@ -37,6 +38,7 @@ class Function:
         description: str,
         parameters: list[Parameter] | None = None,
         required_parameters: list[str] | None = None,
+        strict: bool | None = None,
     ) -> None:
         """Create a new function instance.
 
@@ -46,12 +48,14 @@ class Function:
             parameters: A list of parameters.
             required_parameters: A list of parameter names that are required to run the\
                 function.
+            strict: If the function should enforce strict parameters.
 
         """
         self.name: str = name
         self.description: str = description
         self.parameters: list[Parameter] = parameters or []
         self.required_parameters: list[str] = required_parameters or []
+        self.strict: bool | None = strict
 
         self.validate()
 
@@ -109,6 +113,9 @@ class Function:
                 "properties": parameters_dict,
             },
         }
+
+        if self.strict is not None:
+            output_dict["strict"] = self.strict
 
         if self.required_parameters is None or len(self.required_parameters) == 0:
             return output_dict

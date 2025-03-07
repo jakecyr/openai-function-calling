@@ -343,3 +343,35 @@ def test_merge_with_no_parameters_does_not_add_any() -> None:
     get_current_weather_function.merge(get_tomorrows_weather_function)
 
     assert len(get_current_weather_function.parameters) == 0
+
+
+def test_function_with_strict_true_includes_strict_in_output() -> None:
+    func = Function(
+        name="example_function",
+        description="An example function",
+        strict=True,
+    )
+    func_dict: FunctionDict = func.to_json_schema()
+
+    assert func_dict.get("strict") is True
+
+
+def test_function_with_strict_false_includes_strict_in_output() -> None:
+    func = Function(
+        name="example_function",
+        description="An example function",
+        strict=False,
+    )
+    func_dict: FunctionDict = func.to_json_schema()
+
+    assert func_dict.get("strict") is False
+
+
+def test_function_without_strict_excludes_strict_in_output() -> None:
+    func = Function(
+        name="example_function",
+        description="An example function",
+    )
+    func_dict: FunctionDict = func.to_json_schema()
+
+    assert "strict" not in func_dict
