@@ -177,9 +177,7 @@ class FunctionInferrer:
 
             if parameter_type == "null":
                 if isinstance(parameter.annotation, EnumMeta):
-                    enum_values = list(
-                        parameter.annotation._value2member_map_.keys()  # noqa: SLF001
-                    )
+                    enum_values = list(parameter.annotation._value2member_map_.keys())
                     parameter_type = FunctionInferrer._infer_list_item_type(enum_values)
                 elif dataclasses.is_dataclass(parameter.annotation):
                     parameter_type = JsonSchemaType.OBJECT.value

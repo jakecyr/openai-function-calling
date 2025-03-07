@@ -85,7 +85,7 @@ lint.fixable = [
   "UP",
   "YTT",
 ]
-lint.ignore = ["D407", "D406", "D203", "ANN101", "D213", "PLR0913", "ANN401"]
+lint.ignore = ["D407", "D406", "D203", "D213", "PLR0913", "ANN401"]
 exclude = [
   ".bzr",
   ".direnv",
