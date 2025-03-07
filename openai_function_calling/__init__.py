@@ -8,8 +8,8 @@ from openai_function_calling.parameter import Parameter, ParameterDict
 __all__: list[str] = [
     "Function",
     "FunctionDict",
+    "FunctionInferrer",
+    "JsonSchemaType",
     "Parameter",
     "ParameterDict",
-    "JsonSchemaType",
-    "FunctionInferrer",
 ]

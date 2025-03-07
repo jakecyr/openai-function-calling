@@ -116,12 +116,12 @@ def test_to_json_schema_with_type_array_items_returns_expected_dict() -> None:
 
     parameter_dict: ParameterDict = parameter.to_json_schema()
 
-    assert (
-        "items" in parameter_dict
-    ), "Expected parameter dict to have 'items' property."
-    assert (
-        "type" in parameter_dict["items"]
-    ), "Expected parameter 'items' dict to have 'type' property."
+    assert "items" in parameter_dict, (
+        "Expected parameter dict to have 'items' property."
+    )
+    assert "type" in parameter_dict["items"], (
+        "Expected parameter 'items' dict to have 'type' property."
+    )
     assert isinstance(parameter_dict["items"]["type"], str)
     assert parameter_dict["items"]["type"] == JsonSchemaType.STRING
 

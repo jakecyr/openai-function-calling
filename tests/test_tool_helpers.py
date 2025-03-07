@@ -71,6 +71,7 @@ def test_from_functions_dicts_function_parameters_has_expected_type() -> None:
         [get_current_weather_schema]
     )[0]
 
+    assert "parameters" in tool_param["function"]
     assert isinstance(tool_param["function"]["parameters"], dict)
 
 
